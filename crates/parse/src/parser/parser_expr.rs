@@ -4,6 +4,9 @@ use crate::{
 };
 use lex::token::Token;
 
+/**
+ * 每次成功解析一个token，就必须移动cur，移动到下一个要被解析的token的位置。
+ */
 pub struct ExprTokens {
     pub(crate) tokens: Vec<Token>,
     pub(crate) cur: usize,
@@ -191,10 +194,35 @@ impl ExprTokens {
     pub fn parse_atom(&mut self) -> ParserResult<ExprNode> {
         // call preceed identifier
         if let Token::Identifier(ident) = self.current() {
-            if self.tokens.len() == 1 {
+            if self.cur + 1 >= self.tokens.len() {
                 self.cur += 1;
                 return Ok(ExprNode::Identifer(ident));
             }
+
+            // try to parse chained member
+            if let Token::Dot = self.next_nth(1)? {
+                let mut member_offset = 1;
+                let mut members = Vec::new();
+                // iteratively parse member until there is none
+                while let Token::Dot = self.next_nth(member_offset)? {
+                    if let Token::Identifier(member) = self.next_nth(member_offset + 1)? {
+                        println!("{}", member);
+                        members.push(member);
+                    }
+                    member_offset += 2;
+                    if self.cur + member_offset >= self.tokens.len() {
+                        break;
+                    }
+                }
+                // no more member, or token is eaten up
+                // offset cur pointer
+                self.cur += member_offset;
+                return Ok(ExprNode::Member {
+                    base: ident,
+                    members,
+                });
+            }
+
             // try to parse a call
             if let Token::Lpar = self.next_nth(1)? {
                 if let Token::Rpar = self.next_nth(2)? {
@@ -247,6 +275,9 @@ impl ExprTokens {
             }
         }
 
+        dbg!(&self.tokens);
+        dbg!(&self.cur);
+
         Err(ParserError::InvalidSyntax(format!(
             "Invalid atomic expression starter: {:?}",
             self.current()
@@ -257,3 +288,5 @@ impl ExprTokens {
         todo!()
     }
 }
+
+// member: ident ~ ("." ~ ident)*

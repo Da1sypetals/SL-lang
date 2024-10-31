@@ -1,7 +1,11 @@
 use lex::token::Token;
 
 use crate::{
-    ast::{expr::ExprNode, root::Root, stmt::StmtNode},
+    ast::{
+        expr::ExprNode,
+        root::Root,
+        stmt::{Lvalue, StmtNode},
+    },
     errors::{ParserError, ParserResult},
 };
 
@@ -58,8 +62,11 @@ impl Parser {
                 Token::For => self.parse_for(),
                 Token::While => self.parse_while(),
                 Token::Eof => break,
-                _ => {
-                    todo!("Parse an 'expression statement'")
+                token => {
+                    todo!(
+                        "Starting token: {:?}, Parse an 'expression statement'",
+                        token
+                    )
                 }
             };
 
@@ -82,40 +89,105 @@ impl Parser {
 - 使用if之外的尾部返回值来表示解析失败情况
 
 */
-
+// let a.b =
 impl Parser {
     pub fn parse_let(&self) -> ParserResult<ParserStep> {
         // match: let ident =
-        if let (Token::Identifier(ident), Token::Assign) = (self.next_nth(1), self.next_nth(2)) {
-            // match trailing ;
-            let mut expr_tokens = Vec::new();
-            for i in 3.. {
-                match self.next_nth(i) {
-                    Token::Eof => {
-                        return Err(ParserError::UnexpectedEof);
+        if let Token::Identifier(ident) = self.next_nth(1) {
+            let mut member_offset = 2;
+            let mut members = Vec::new();
+            'parse_members: loop {
+                match self.next_nth(member_offset) {
+                    Token::Dot => {
+                        if let Token::Identifier(member) = self.next_nth(member_offset + 1) {
+                            members.push(member);
+                            member_offset += 2;
+                        } else {
+                            return Err(ParserError::InvalidSyntax(format!(
+                                "Expected identfier after member operator `.`"
+                            )));
+                        }
                     }
-                    Token::Semicolon => {
-                        break;
-                    }
-                    other => {
-                        expr_tokens.push(other);
+                    Token::Assign => break 'parse_members,
+                    token => {
+                        return Err(ParserError::InvalidSyntax(format!(
+                            "Invalid member seperator: {:?}",
+                            token
+                        )));
                     }
                 }
             }
 
-            // try parse intermediate tokens into expr
-            let len = expr_tokens.len();
-            return Ok(ParserStep {
-                stmt: StmtNode::Let {
-                    ident,
-                    expr: ExprNode::try_from(expr_tokens)?,
-                },
-                step: 4 + len,
-            });
+            if let Token::Assign = self.next_nth(member_offset) {
+                // match trailing ;
+                let mut expr_tokens = Vec::new();
+                for i in member_offset + 1.. {
+                    match self.next_nth(i) {
+                        Token::Eof => {
+                            return Err(ParserError::UnexpectedEof);
+                        }
+                        Token::Semicolon => {
+                            break;
+                        }
+                        other => {
+                            expr_tokens.push(other);
+                        }
+                    }
+                }
+                // try parse intermediate tokens into expr
+                let len = expr_tokens.len();
+                let target = if members.is_empty() {
+                    Lvalue::Identifier(ident)
+                } else {
+                    Lvalue::Member {
+                        base: ident,
+                        members,
+                    }
+                };
+                return Ok(ParserStep {
+                    stmt: StmtNode::Let {
+                        target,
+                        expr: ExprNode::try_from(expr_tokens)?,
+                    },
+                    // let <> = <>;
+                    step: member_offset + len + 2,
+                });
+            }
         }
 
         Err(crate::errors::ParserError::InvalidSyntax("Let".to_string()))
     }
+
+    // pub fn parse_let(&self) -> ParserResult<ParserStep> {
+    //     // match: let ident =
+    //     if let (Token::Identifier(ident), Token::Assign) = (self.next_nth(1), self.next_nth(2)) {
+    //         // match trailing ;
+    //         let mut expr_tokens = Vec::new();
+    //         for i in 3.. {
+    //             match self.next_nth(i) {
+    //                 Token::Eof => {
+    //                     return Err(ParserError::UnexpectedEof);
+    //                 }
+    //                 Token::Semicolon => {
+    //                     break;
+    //                 }
+    //                 other => {
+    //                     expr_tokens.push(other);
+    //                 }
+    //             }
+    //         }
+    //         // try parse intermediate tokens into expr
+    //         let len = expr_tokens.len();
+    //         return Ok(ParserStep {
+    //             stmt: StmtNode::Let {
+    //                 ident,
+    //                 expr: ExprNode::try_from(expr_tokens)?,
+    //             },
+    //             step: 4 + len,
+    //         });
+    //     }
+    //     Err(crate::errors::ParserError::InvalidSyntax("Let".to_string()))
+    // }
 
     pub fn parse_for(&self) -> ParserResult<ParserStep> {
         // match: let ident =
@@ -331,7 +403,7 @@ impl Parser {
                     body_tokens.push(other);
                 }
             }
-            dbg!(n_lbr);
+            // dbg!(n_lbr);
         }
         let len = body_tokens.len();
         let body = Parser::new(body_tokens).parse_stmt()?.statements;

@@ -17,8 +17,8 @@ pub fn print_stmt_lvl(node: StmtNode, lvl: usize) {
         StmtNode::Expression { expr } => {
             println!("{:?};", expr);
         }
-        StmtNode::Let { ident, expr } => {
-            println!("let {} = {:?};", ident, expr);
+        StmtNode::Let { target, expr } => {
+            println!("let {:?} = {:?};", target, expr);
         }
         StmtNode::Return { expr } => {
             println!("return {:?};", expr);

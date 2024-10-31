@@ -1,6 +1,12 @@
 use super::expr::ExprNode;
 
 #[derive(Clone, Debug)]
+pub enum Lvalue {
+    Identifier(String),
+    Member { base: String, members: Vec<String> },
+}
+
+#[derive(Clone, Debug)]
 pub enum StmtNode {
     Expression {
         expr: ExprNode,
@@ -8,7 +14,7 @@ pub enum StmtNode {
 
     // others
     Let {
-        ident: String,
+        target: Lvalue,
         expr: ExprNode,
     },
     Return {
