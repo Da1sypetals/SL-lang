@@ -8,5 +8,4 @@ pub mod ast;
 pub mod display;
 pub mod errors;
 pub mod parser;
-pub mod statements;
 pub mod types;
