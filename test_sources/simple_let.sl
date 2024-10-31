@@ -13,7 +13,29 @@ for __i_j:  -(true+113+(teer * __hello_world___)) /(__self_builtin*(false*empty)
 }
 let a__asd__a = __a_q;
 let b = exile;
-for __i_j:  _q__q_1{
+
+func fn1(a,b,c,d,_a,__aqwe,_bba_a,asdd){
+    func a (q, w, e, r__q_11_q, zzz) {
+        while fn(-!!!--!(true+113+(teer * __hello_world___)) /(__self_builtin*(false*empty)), 124,-1144.112,true) {
+           if (__self_builtin*(false*empty)) {
+            let aa__a_q = 1333.3+224241.1;
+           }else{
+            return true+113+(teer * __hello_world___);
+           }
+        }
+        let b = exile;
+    let aaa_1331=  true;
+    if teer{
+        while teer{
+        let xxx = uuu;
+        let xxx = exile;
+        }
+    }
+    }
+}
+
+
+for __i_j:  !!-!(_q__q_1+123314.4441+caller(1,2,444+__1__31aa)){
     func a (q, w, e, r__q_11_q, zzz) {
         let b = exile;
     let aaa_1331=  true;

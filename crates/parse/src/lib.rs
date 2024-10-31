@@ -5,6 +5,7 @@ use pretty_env_logger;
 pub mod tests;
 
 pub mod ast;
+pub mod display;
 pub mod errors;
 pub mod parser;
 pub mod statements;

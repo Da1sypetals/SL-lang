@@ -1,5 +1,3 @@
-use core::panic;
-
 use lex::token::Token;
 
 use crate::{
@@ -15,7 +13,7 @@ pub struct ParserStep {
 }
 
 impl Parser {
-    pub fn parse_stmt(&mut self) -> Root {
+    pub fn parse_stmt(&mut self) -> ParserResult<Root> {
         let mut statements = Vec::new();
 
         while self.cur < self.tokens.len() {
@@ -70,14 +68,11 @@ impl Parser {
                     statements.push(stmt);
                     self.advance(step);
                 }
-                Err(err) => {
-                    // currently...
-                    panic!("Failed parse: {}", err)
-                }
+                Err(err) => return Err(err),
             }
         }
 
-        Root { statements }
+        Ok(Root { statements })
     }
 }
 
@@ -184,7 +179,7 @@ impl Parser {
                 }
                 dbg!(&body_tokens);
                 let len = body_tokens.len();
-                let body = Parser::new(body_tokens).parse_stmt().statements;
+                let body = Parser::new(body_tokens).parse_stmt()?.statements;
                 return Ok(ParserStep {
                     stmt: StmtNode::For { iter, n_iter, body },
                     step: body_start + len + 1,
@@ -240,7 +235,7 @@ impl Parser {
             dbg!(n_lbr);
         }
         let len = body_tokens.len();
-        let body = Parser::new(body_tokens).parse_stmt().statements;
+        let body = Parser::new(body_tokens).parse_stmt()?.statements;
         Ok((body, len + 3))
     }
 
@@ -274,7 +269,7 @@ impl Parser {
             dbg!(n_lbr);
         }
         let len = body_tokens.len();
-        let body = Parser::new(body_tokens).parse_stmt().statements;
+        let body = Parser::new(body_tokens).parse_stmt()?.statements;
         Ok(ParserStep {
             stmt: StmtNode::Scope { body },
             step: len + 2,
@@ -339,7 +334,7 @@ impl Parser {
             dbg!(n_lbr);
         }
         let len = body_tokens.len();
-        let body = Parser::new(body_tokens).parse_stmt().statements;
+        let body = Parser::new(body_tokens).parse_stmt()?.statements;
         Ok((cond, body, body_start + len + 1))
     }
 
@@ -430,7 +425,7 @@ impl Parser {
                     }
                     sep => {
                         return Err(ParserError::InvalidSyntax(format!(
-                            "Expect comma or rpar, got {:?}",
+                            "Expected comma or rpar, got {:?}",
                             sep
                         )))
                     }
@@ -466,7 +461,7 @@ impl Parser {
                 dbg!(n_lbr);
             }
             let len = body_tokens.len();
-            let body = Parser::new(body_tokens).parse_stmt().statements;
+            let body = Parser::new(body_tokens).parse_stmt()?.statements;
             return Ok(ParserStep {
                 stmt: StmtNode::FuncDef { name, params, body },
                 step: body_start + len + 1,
