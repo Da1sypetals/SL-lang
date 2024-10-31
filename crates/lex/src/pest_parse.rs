@@ -1,6 +1,6 @@
 use std::fs;
 
-use log::{error, info};
+use log::error;
 use pest::Parser;
 use pest_derive::Parser;
 

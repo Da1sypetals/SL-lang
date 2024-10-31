@@ -1,12 +1,6 @@
-use std::fs;
-
-use log::info;
+use crate::pest_parse::{sl_parse_file, Rule, SlParser};
 use pest::Parser;
-
-use crate::{
-    pest_parse::{sl_parse_file, Rule, SlParser},
-    tokenize::{IntoTokenIterator, TokenIterator},
-};
+use std::fs;
 
 #[test]
 fn test_lex_base() {

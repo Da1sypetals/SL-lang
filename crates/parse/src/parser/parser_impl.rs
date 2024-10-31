@@ -5,7 +5,6 @@ use lex::token::Token;
 use crate::{
     ast::{expr::ExprNode, root::Root, stmt::StmtNode},
     errors::{ParserError, ParserResult},
-    types::literal::Literal,
 };
 
 use super::parser::Parser;
@@ -61,7 +60,7 @@ impl Parser {
                 Token::For => self.parse_for(),
                 Token::While => self.parse_while(),
                 Token::Eof => break,
-                token => {
+                _ => {
                     todo!("Parse an 'expression statement'")
                 }
             };

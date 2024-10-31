@@ -6,8 +6,6 @@ use crate::{
     types::literal::Literal,
 };
 
-use super::root::Root;
-
 #[derive(Debug, Clone)]
 pub enum ExprNode {
     // atomic

@@ -1,6 +1,6 @@
 use std::{fs, io::Write};
 
-use lex::{pest_parse::sl_parse_file, token};
+use lex::pest_parse::sl_parse_file;
 
 use crate::parser::parser::Parser;
 
