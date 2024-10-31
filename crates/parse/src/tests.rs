@@ -9,7 +9,7 @@ fn test_base() {
     //
     let tokens = sl_parse_file("../../test_sources/simple_let.sl");
     for tk in tokens {
-        dbg!(tk);
+        // dbg!(tk);
     }
 
     let tokens = sl_parse_file("../../test_sources/simple_let.sl");

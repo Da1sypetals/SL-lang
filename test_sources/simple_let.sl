@@ -1,11 +1,12 @@
 let a = 1;
-return 133;
+return 133+244;
 let __b_qwc13 =-2.4124355;
 let a = "hello world";
+let z = !(100+(200/244+(-true*add(teer, "Hello world", false, exile))))
 let b = exile;
 let aaa_1331=  true;
 let a__asd__a = __a_q;
-for __i_j:  133{
+for __i_j:  -(true+113+(teer * __hello_world___)) /(__self_builtin*(false*empty)){
     let b = exile;
     let aaa_1331=  true;
     let a__asd__a = __a_q;

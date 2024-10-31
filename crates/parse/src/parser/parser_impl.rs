@@ -98,7 +98,7 @@ impl Parser {
             for i in 3.. {
                 match self.next_nth(i) {
                     Token::Eof => {
-                        return Err(ParserError::InvalidSyntax("Let".to_string()));
+                        return Err(ParserError::UnexpectedEof);
                     }
                     Token::Semicolon => {
                         break;
@@ -111,12 +111,13 @@ impl Parser {
 
             // try parse intermediate tokens into expr
             let len = expr_tokens.len();
-            if let Ok(expr) = expr_tokens.try_into() {
-                return Ok(ParserStep {
-                    stmt: StmtNode::Let { ident, expr },
-                    step: 4 + len,
-                });
-            }
+            return Ok(ParserStep {
+                stmt: StmtNode::Let {
+                    ident,
+                    expr: ExprNode::try_from(expr_tokens)?,
+                },
+                step: 4 + len,
+            });
         }
 
         Err(crate::errors::ParserError::InvalidSyntax("Let".to_string()))
@@ -191,7 +192,7 @@ impl Parser {
                 });
             }
         }
-        Err(crate::errors::ParserError::InvalidSyntax("Let".to_string()))
+        Err(crate::errors::ParserError::InvalidSyntax("For".to_string()))
     }
 
     pub fn parse_while(&self) -> ParserResult<ParserStep> {
@@ -369,7 +370,9 @@ impl Parser {
             });
         }
 
-        Err(crate::errors::ParserError::InvalidSyntax("Let".to_string()))
+        Err(crate::errors::ParserError::InvalidSyntax(
+            "Return".to_string(),
+        ))
     }
 
     pub fn parse_print(&self) -> ParserResult<ParserStep> {
@@ -398,7 +401,9 @@ impl Parser {
             });
         }
 
-        Err(crate::errors::ParserError::InvalidSyntax("Let".to_string()))
+        Err(crate::errors::ParserError::InvalidSyntax(
+            "Print".to_string(),
+        ))
     }
 
     pub fn parse_func(&self) -> ParserResult<ParserStep> {

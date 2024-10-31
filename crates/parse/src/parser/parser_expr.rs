@@ -10,6 +10,16 @@ pub struct ExprTokens {
 }
 
 impl ExprTokens {
+    pub fn is_terminal(&self) -> bool {
+        if self.cur < self.tokens.len() {
+            false
+        } else if self.cur == self.tokens.len() {
+            true
+        } else {
+            panic!("Internal error: current cursor exceeds token length!");
+        }
+    }
+
     pub fn current(&self) -> Token {
         self.tokens[self.cur].clone()
     }
@@ -26,6 +36,7 @@ impl ExprTokens {
 /// remember to advance cur poiner
 impl ExprTokens {
     pub fn parse_expr(&mut self) -> ParserResult<ExprNode> {
+        println!("tokens: {:?}", self.tokens);
         self.parse_equality()
     }
 
@@ -34,7 +45,11 @@ impl ExprTokens {
 
         let mut eq_continue = true;
         while eq_continue {
+            if self.is_terminal() {
+                return Ok(left);
+            }
             eq_continue = false;
+
             if let Token::Eq = self.current() {
                 eq_continue = true;
                 self.cur += 1;
@@ -60,6 +75,9 @@ impl ExprTokens {
 
         let mut cmp_continue = true;
         while cmp_continue {
+            if self.is_terminal() {
+                return Ok(left);
+            }
             cmp_continue = false;
 
             if let Token::Gt = self.current() {
@@ -102,6 +120,9 @@ impl ExprTokens {
 
         let mut add_continue = true;
         while add_continue {
+            if self.is_terminal() {
+                return Ok(left);
+            }
             add_continue = false;
 
             if let Token::Plus = self.current() {
@@ -128,6 +149,9 @@ impl ExprTokens {
 
         let mut mul_continue = true;
         while mul_continue {
+            if self.is_terminal() {
+                return Ok(left);
+            }
             mul_continue = false;
 
             if let Token::Star = self.current() {
@@ -150,25 +174,27 @@ impl ExprTokens {
     }
 
     pub fn parse_unary(&mut self) -> ParserResult<ExprNode> {
+        // UNOP unary_expr
         if let Token::Not = self.current() {
             self.cur += 1;
-            return Ok(ExprNode::not(self.parse_atom()?));
+            return Ok(ExprNode::not(self.parse_unary()?));
         }
-
         if let Token::Minus = self.current() {
             self.cur += 1;
-            return Ok(ExprNode::not(self.parse_atom()?));
+            return Ok(ExprNode::neg(self.parse_unary()?));
         }
 
-        Err(ParserError::InvalidSyntax(format!(
-            "Invalid unary operator: {:?}",
-            self.current()
-        )))
+        // ... or atom
+        self.parse_atom()
     }
 
     pub fn parse_atom(&mut self) -> ParserResult<ExprNode> {
         // call preceed identifier
         if let Token::Identifier(ident) = self.current() {
+            if self.tokens.len() == 1 {
+                self.cur += 1;
+                return Ok(ExprNode::Identifer(ident));
+            }
             // try to parse a call
             if let Token::Lpar = self.next_nth(1)? {
                 if let Token::Rpar = self.next_nth(2)? {
@@ -189,7 +215,7 @@ impl ExprTokens {
                             Token::Comma => {
                                 self.cur += 1;
                             }
-                            Token::Rbrace => {
+                            Token::Rpar => {
                                 self.cur += 1;
                                 break 'parse_args;
                             }

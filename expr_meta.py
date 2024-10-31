@@ -1,3 +1,8 @@
+"""
+This metaprogram is mainly used for ensuring correctness.
+"""
+
+
 def eq_gen(funcs):
     def chunk(variant, func):
         return f"\nif let Token::{variant} = self.current() {{\n    eq_continue = true;\n    self.cur += 1;\n    let right = self.parse_add()?;\n    left = ExprNode::{func}(left, right);\n    continue;\n}}\n"
