@@ -1,0 +1,138 @@
+// t_int      = @{ "int" }
+// t_teer     = @{ "teer" }
+// t_string   = @{ "string" }
+// t_bool     = @{ "bool" }
+// t_float    = @{ "float" }
+// basic_type =  { t_int | t_teer | t_string | t_bool | t_float }
+// field      =  { ident ~ ":" ~ basic_type }
+// model      =  { "model" ~ "{" ~ field* ~ "}" }
+
+// #####################################################################
+// ############################### token ###############################
+// #####################################################################
+
+// numbers:
+// uint is not used directly
+uint  =  { "0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
+int   = @{ "-"? ~ ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
+float = @{ "-"? ~ uint ~ "." ~ ASCII_DIGIT+ }
+
+// string
+char           =  {
+    !("\"" | "\\") ~ ANY
+  | "\\" ~ ("\"" | "\\" | "/" | "b" | "f" | "n" | "r" | "t")
+  | "\\" ~ ("u" ~ ASCII_HEX_DIGIT{4})
+}
+string         = @{ char* }
+string_wrapper = _{ "\"" ~ string ~ "\"" }
+
+// other types: teer for `ter`nary and the additional `e` in the beginning of every variant
+nil  = @{ "nil" }
+bool = @{ "true" | "false" }
+teer = @{ "excel" | "empty" | "exile" }
+
+// value: float is more specific than int
+literal = _{ nil | bool | teer | float | int | string_wrapper }
+
+neq       = { "!=" }
+and       = { "&&" }
+leq       = { "<=" }
+eq        = { "==" }
+geq       = { ">=" }
+or        = { "||" }
+not       = { "!" }
+hash      = { "#" }
+percent   = { "%" }
+lpar      = { "(" }
+rpar      = { ")" }
+star      = { "*" }
+plus      = { "+" }
+comma     = { "," }
+minus     = { "-" }
+dot       = { "." }
+slash     = { "/" }
+colon     = { ":" }
+semicolon = { ";" }
+lt        = { "<" }
+assign    = { "=" }
+gt        = { ">" }
+matmul    = { "@" }
+lbracket  = { "[" }
+rbracket  = { "]" }
+lbrace    = { "{" }
+rbrace    = { "}" }
+
+sign = _{
+    neq
+  | and
+  | leq
+  | eq
+  | geq
+  | or
+  | not
+  | hash
+  | percent
+  | lpar
+  | rpar
+  | star
+  | plus
+  | comma
+  | minus
+  | dot
+  | slash
+  | semicolon
+  | colon
+  | lt
+  | assign
+  | gt
+  | matmul
+  | lbracket
+  | rbracket
+  | lbrace
+  | rbrace
+}
+
+// r_ : reserved
+// model: for defining (heap allocated) struct
+r_let    = { "let" }
+r_func   = { "func" }
+r_typeof = { "typeof" }
+r_if     = { "if" }
+r_else   = { "else" }
+r_model  = { "model" }
+r_print  = { "print" }
+r_for    = { "for" }
+r_while  = { "while" }
+r_return = { "return" }
+
+reserved = _{
+    r_let
+  | r_func
+  | r_typeof
+  | r_if
+  | r_else
+  | r_model
+  | r_print
+  | r_for
+  | r_while
+  | r_return
+}
+
+ident_start =  { ASCII_ALPHA | "_" }
+ident_char  =  { ASCII_ALPHANUMERIC | "_" }
+ident       = @{ ident_start ~ ident_char* }
+
+// keyword preceed identifier;
+// literal preceed sign, please mind the dot inside floats.
+token = _{
+    reserved
+  | literal
+  | sign
+  | ident
+}
+
+// finally...
+source = { SOI ~ token* ~ EOI }
+
+// others
+WHITESPACE = _{ " " | "\n" }

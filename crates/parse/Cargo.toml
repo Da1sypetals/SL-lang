@@ -1,0 +1,10 @@
+[package]
+name = "parse"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+log = "0.4"
+pretty_env_logger = "0.4"
+lex = { path = "../lex" }
+thiserror = "1.0.65"
