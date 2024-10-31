@@ -56,12 +56,14 @@ impl Parser {
                     }
                     Err(e) => Err(e),
                 },
-                Token::Model => todo!(),
+                Token::Model => todo!("Model statement is not implemented"),
                 Token::Print => self.parse_print(),
                 Token::For => self.parse_for(),
                 Token::While => self.parse_while(),
                 Token::Eof => break,
-                t => todo!("Unexpected statement starter: {:?}", t),
+                token => {
+                    todo!("Parse an 'expression statement'")
+                }
             };
 
             match statement {
@@ -143,9 +145,7 @@ impl Parser {
                             }
                         }
                         Token::Eof => {
-                            return Err(ParserError::InvalidSyntax(
-                                "For: Unexpected EOF!".to_string(),
-                            ));
+                            return Err(ParserError::UnexpectedEof);
                         }
                         token => {
                             n_iter_expr_tokens.push(token);
@@ -162,9 +162,7 @@ impl Parser {
                     match self.next_nth(i) {
                         // get EOF before }
                         Token::Eof => {
-                            return Err(ParserError::InvalidSyntax(
-                                "For: Unexpected EOF!".to_string(),
-                            ));
+                            return Err(ParserError::UnexpectedEof);
                         }
                         other => {
                             match other {
@@ -221,9 +219,7 @@ impl Parser {
             match self.next_nth(i) {
                 // get EOF before }
                 Token::Eof => {
-                    return Err(ParserError::InvalidSyntax(
-                        "Scope: Unexpected EOF!".to_string(),
-                    ));
+                    return Err(ParserError::UnexpectedEof);
                 }
                 other => {
                     match other {
@@ -257,9 +253,7 @@ impl Parser {
             match self.next_nth(i) {
                 // get EOF before }
                 Token::Eof => {
-                    return Err(ParserError::InvalidSyntax(
-                        "Scope: Unexpected EOF!".to_string(),
-                    ));
+                    return Err(ParserError::UnexpectedEof);
                 }
                 other => {
                     match other {
@@ -307,9 +301,7 @@ impl Parser {
                     }
                 }
                 Token::Eof => {
-                    return Err(ParserError::InvalidSyntax(
-                        "While: Unexpected EOF!".to_string(),
-                    ));
+                    return Err(ParserError::UnexpectedEof);
                 }
                 token => {
                     cond_expr_tokens.push(token);
@@ -326,9 +318,7 @@ impl Parser {
             match self.next_nth(i) {
                 // get EOF before }
                 Token::Eof => {
-                    return Err(ParserError::InvalidSyntax(
-                        "While: Unexpected EOF!".to_string(),
-                    ));
+                    return Err(ParserError::UnexpectedEof);
                 }
                 other => {
                     match other {
@@ -414,14 +404,14 @@ impl Parser {
     pub fn parse_func(&self) -> ParserResult<ParserStep> {
         if let (Token::Identifier(name), Token::Lpar) = (self.next_nth(1), self.next_nth(2)) {
             let mut ipeek = 3;
-            let mut args = Vec::new();
-            // parse arg list
+            let mut params = Vec::new();
+            // parse param list
             loop {
-                if let Token::Identifier(arg) = self.next_nth(ipeek) {
-                    if args.contains(&arg) {
-                        return Err(ParserError::DuplicateArg(arg));
+                if let Token::Identifier(param) = self.next_nth(ipeek) {
+                    if params.contains(&param) {
+                        return Err(ParserError::DuplicateArg(param));
                     } else {
-                        args.push(arg);
+                        params.push(param);
                     }
                 }
                 let sep = self.next_nth(ipeek + 1);
@@ -451,9 +441,7 @@ impl Parser {
                 match self.next_nth(i) {
                     // get EOF before }
                     Token::Eof => {
-                        return Err(ParserError::InvalidSyntax(
-                            "While: Unexpected EOF!".to_string(),
-                        ));
+                        return Err(ParserError::UnexpectedEof);
                     }
                     other => {
                         match other {
@@ -476,7 +464,7 @@ impl Parser {
             let len = body_tokens.len();
             let body = Parser::new(body_tokens).parse_stmt().statements;
             return Ok(ParserStep {
-                stmt: StmtNode::FuncDef { name, args, body },
+                stmt: StmtNode::FuncDef { name, params, body },
                 step: body_start + len + 1,
             });
         }

@@ -34,6 +34,8 @@ let xxx = uuu;
         let xxx = exile;
         } else{
             while 1.41244 {
+                print b;
+                print -114.514;
                 let a = 1;
             }
             return 2;

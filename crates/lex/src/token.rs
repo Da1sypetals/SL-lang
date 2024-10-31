@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 #[allow(non_camel_case_types)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum teer {
     excel,
     empty,
@@ -21,7 +21,7 @@ impl FromStr for teer {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Token {
     // literal
     Int(i64),

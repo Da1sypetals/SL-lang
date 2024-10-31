@@ -1,0 +1,86 @@
+
+if let Token::Eq = self.current() {
+    eq_continue = true;
+    self.cur += 1;
+    let right = self.parse_add()?;
+    left = ExprNode::eq(left, right);
+    continue;
+}
+
+
+if let Token::Neq = self.current() {
+    eq_continue = true;
+    self.cur += 1;
+    let right = self.parse_add()?;
+    left = ExprNode::neq(left, right);
+    continue;
+}
+
+if let Token::Gt = self.current() {
+    cmp_continue = true;
+    self.cur += 1;
+    let right = self.parse_add()?;
+    left = ExprNode::gt(left, right);
+    continue;
+}
+
+
+if let Token::Geq = self.current() {
+    cmp_continue = true;
+    self.cur += 1;
+    let right = self.parse_add()?;
+    left = ExprNode::geq(left, right);
+    continue;
+}
+
+
+if let Token::Lt = self.current() {
+    cmp_continue = true;
+    self.cur += 1;
+    let right = self.parse_add()?;
+    left = ExprNode::lt(left, right);
+    continue;
+}
+
+
+if let Token::Leq = self.current() {
+    cmp_continue = true;
+    self.cur += 1;
+    let right = self.parse_add()?;
+    left = ExprNode::leq(left, right);
+    continue;
+}
+
+if let Token::Plus = self.current() {
+    add_continue = true;
+    self.cur += 1;
+    let right = self.parse_add()?;
+    left = ExprNode::add(left, right);
+    continue;
+}
+
+
+if let Token::Minus = self.current() {
+    add_continue = true;
+    self.cur += 1;
+    let right = self.parse_add()?;
+    left = ExprNode::minus(left, right);
+    continue;
+}
+
+if let Token::Star = self.current() {
+    mul_continue = true;
+    self.cur += 1;
+    let right = self.parse_add()?;
+    left = ExprNode::mul(left, right);
+    continue;
+}
+
+
+if let Token::Slash = self.current() {
+    mul_continue = true;
+    self.cur += 1;
+    let right = self.parse_add()?;
+    left = ExprNode::div(left, right);
+    continue;
+}

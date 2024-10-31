@@ -2,6 +2,11 @@ use super::expr::ExprNode;
 
 #[derive(Clone, Debug)]
 pub enum StmtNode {
+    Expression {
+        expr: ExprNode,
+    },
+
+    // others
     Let {
         ident: String,
         expr: ExprNode,
@@ -10,9 +15,6 @@ pub enum StmtNode {
         expr: ExprNode,
     },
     Print {
-        expr: ExprNode,
-    },
-    Expression {
         expr: ExprNode,
     },
     For {
@@ -38,7 +40,7 @@ pub enum StmtNode {
     },
     FuncDef {
         name: String,
-        args: Vec<String>,
+        params: Vec<String>,
         body: Vec<StmtNode>,
     },
 }
