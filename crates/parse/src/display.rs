@@ -83,5 +83,14 @@ pub fn print_stmt_lvl(node: StmtNode, lvl: usize) {
             indent(lvl);
             println!("}}");
         }
+        StmtNode::Model { name, fields } => {
+            println!("model {} {{", name);
+            for (name, typename) in fields {
+                indent(lvl + 1);
+                println!("{}: {},", name, typename);
+            }
+            indent(lvl);
+            println!("}}");
+        }
     }
 }

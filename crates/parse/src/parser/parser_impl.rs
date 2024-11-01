@@ -1,3 +1,5 @@
+use std::collections::{BTreeMap, BTreeSet};
+
 use lex::token::Token;
 
 use crate::{
@@ -57,7 +59,7 @@ impl Parser {
                     }
                     Err(e) => Err(e),
                 },
-                Token::Model => todo!("Model statement is not implemented"),
+                Token::Model => self.parse_model(),
                 Token::Print => self.parse_print(),
                 Token::For => self.parse_for(),
                 Token::While => self.parse_while(),
@@ -540,5 +542,49 @@ impl Parser {
             });
         }
         Err(ParserError::InvalidSyntax("Func def".to_string()))
+    }
+
+    fn parse_model(&self) -> ParserResult<ParserStep> {
+        if let (Token::Identifier(model_name), Token::Lbrace) = (self.next_nth(1), self.next_nth(2))
+        {
+            let mut field_start = 3;
+            let mut fieldnames = BTreeSet::new();
+            let mut fields = Vec::new();
+            loop {
+                // try end model
+                if let Token::Rbrace = self.next_nth(field_start) {
+                    return Ok(ParserStep {
+                        stmt: StmtNode::Model {
+                            name: model_name,
+                            fields,
+                        },
+                        step: field_start + 1, // + Rbrace
+                    });
+                }
+
+                // try parse next field
+                if let (
+                    Token::Identifier(field_name),
+                    Token::Colon,
+                    Token::Identifier(typename),
+                    Token::Comma,
+                ) = (
+                    self.next_nth(field_start),
+                    self.next_nth(field_start + 1),
+                    self.next_nth(field_start + 2),
+                    self.next_nth(field_start + 3),
+                ) {
+                    //
+                    if fieldnames.contains(&field_name) {
+                        // duplicate field name
+                        return Err(ParserError::DuplicateArg(field_name));
+                    }
+                    fieldnames.insert(field_name.clone());
+                    fields.push((field_name, typename));
+                    field_start += 4;
+                }
+            }
+        }
+        Err(ParserError::InvalidSyntax("Model def".to_string()))
     }
 }

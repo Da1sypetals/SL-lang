@@ -1,3 +1,18 @@
+model a{
+    a:a,
+    b:b,
+    c:c,
+    d:d,
+}
+
+model b{
+    a:a,
+    d:b,
+    c:c,
+    d:d,
+}
+
+
 let q.w.e.r=1;
 let q=133.13;
 let qqw.qq = -exile;

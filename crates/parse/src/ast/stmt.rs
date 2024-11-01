@@ -49,6 +49,12 @@ pub enum StmtNode {
         params: Vec<String>,
         body: Vec<StmtNode>,
     },
+
+    Model {
+        name: String,
+        // name -> type
+        fields: Vec<(String, String)>,
+    },
 }
 
 impl StmtNode {

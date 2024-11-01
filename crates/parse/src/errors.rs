@@ -13,7 +13,10 @@ pub enum ParserError {
     UnexpectedEof, // message
 
     #[error("Function has duplicate arguments: {}", .0)]
-    DuplicateArg(String), // message
+    DuplicateArg(String), // arg
+
+    #[error("Model has duplicate fields: {}", .0)]
+    DuplicateField(String), // fieldname
 
     #[error("Invalid expression: {}", .0)]
     InvalidExpression(String), // message
