@@ -52,8 +52,7 @@ pub enum StmtNode {
 
     Model {
         name: String,
-        // name -> type
-        fields: Vec<(String, String)>,
+        fields: Vec<String>,
     },
 }
 

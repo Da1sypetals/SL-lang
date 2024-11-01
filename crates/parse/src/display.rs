@@ -1,4 +1,4 @@
-use crate::ast::{expr::ExprNode, stmt::StmtNode};
+use crate::ast::stmt::StmtNode;
 
 pub fn print_stmt(node: StmtNode) {
     print_stmt_lvl(node, 0);
@@ -85,9 +85,9 @@ pub fn print_stmt_lvl(node: StmtNode, lvl: usize) {
         }
         StmtNode::Model { name, fields } => {
             println!("model {} {{", name);
-            for (name, typename) in fields {
+            for name in fields {
                 indent(lvl + 1);
-                println!("{}: {},", name, typename);
+                println!("{},", name);
             }
             indent(lvl);
             println!("}}");

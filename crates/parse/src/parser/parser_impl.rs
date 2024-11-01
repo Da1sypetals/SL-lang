@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 
 use lex::token::Token;
 
@@ -548,7 +548,6 @@ impl Parser {
         if let (Token::Identifier(model_name), Token::Lbrace) = (self.next_nth(1), self.next_nth(2))
         {
             let mut field_start = 3;
-            let mut fieldnames = BTreeSet::new();
             let mut fields = Vec::new();
             loop {
                 // try end model
@@ -563,25 +562,19 @@ impl Parser {
                 }
 
                 // try parse next field
-                if let (
-                    Token::Identifier(field_name),
-                    Token::Colon,
-                    Token::Identifier(typename),
-                    Token::Comma,
-                ) = (
-                    self.next_nth(field_start),
-                    self.next_nth(field_start + 1),
-                    self.next_nth(field_start + 2),
-                    self.next_nth(field_start + 3),
-                ) {
+                if let (Token::Identifier(field_name), Token::Comma) =
+                    (self.next_nth(field_start), self.next_nth(field_start + 1))
+                {
                     //
-                    if fieldnames.contains(&field_name) {
+                    if fields.contains(&field_name) {
                         // duplicate field name
                         return Err(ParserError::DuplicateArg(field_name));
                     }
-                    fieldnames.insert(field_name.clone());
-                    fields.push((field_name, typename));
-                    field_start += 4;
+                    fields.push(field_name);
+                    field_start += 2;
+                } else {
+                    // jump to end: Err
+                    break;
                 }
             }
         }

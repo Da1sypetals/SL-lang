@@ -1,15 +1,9 @@
 model a{
-    a:a,
-    b:b,
-    c:c,
-    d:d,
+    a,b,c,d,
 }
 
 model b{
-    a:a,
-    d:b,
-    c:c,
-    d:d,
+   a,b,c,az, as, e,f,
 }
 
 
