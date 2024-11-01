@@ -14,6 +14,10 @@ pub enum StmtNode {
 
     // others
     Let {
+        ident: String,
+        expr: ExprNode,
+    },
+    Assign {
         target: Lvalue,
         expr: ExprNode,
     },

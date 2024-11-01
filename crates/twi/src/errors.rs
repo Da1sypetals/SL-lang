@@ -12,6 +12,16 @@ pub enum TwiError {
 
     #[error("{:?} is not a model, cannot its member", .0)]
     CannotGetMember(String),
+
+    #[error("Invalid global definition: {} is not allowed in global scope", .0)]
+    InvalidGlobalDefinition(String),
+
+    #[error("`main` function is not found!")]
+    MainNotFound,
+
+    // runtime
+    #[error("Duplicate local binding: {}", .0)]
+    DuplicateLocalBind(String), // ident
 }
 
 pub type TwiResult<T> = Result<T, TwiError>;

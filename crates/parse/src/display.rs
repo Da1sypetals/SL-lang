@@ -17,7 +17,10 @@ pub fn print_stmt_lvl(node: StmtNode, lvl: usize) {
         StmtNode::Expression { expr } => {
             println!("{:?};", expr);
         }
-        StmtNode::Let { target, expr } => {
+        StmtNode::Let {
+            ident: target,
+            expr,
+        } => {
             println!("let {:?} = {:?};", target, expr);
         }
         StmtNode::Return { expr } => {
@@ -91,6 +94,9 @@ pub fn print_stmt_lvl(node: StmtNode, lvl: usize) {
             }
             indent(lvl);
             println!("}}");
+        }
+        StmtNode::Assign { target, expr } => {
+            println!("{:?} = {:?};", target, expr);
         }
     }
 }

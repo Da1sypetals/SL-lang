@@ -9,10 +9,14 @@ model b{
 let a = new a;
 let v = a+(new a+b+(a(new a, v, c)))
 
-let q.w.e.r=1;
+a = 12313;
+b = 133+244*(qqwqwd.as.dsgsdg+qwfq.weg.asdvdv);
+___Aqwe_qwd.qwddqa.q.qw.s.werwe=-0.123;
+
+q.w.e.r=1;
 let q=133.13;
-let qqw.qq = -exile;
-let qw.qwfs.asfas.bsdfg.__124fdfswe=  133+244*(qqwqwd.as.dsgsdg+qwfq.weg.asdvdv);
+qqw.qq = -exile;
+qw.qwfs.asfas.bsdfg.__124fdfswe=  133+244*(qqwqwd.as.dsgsdg+qwfq.weg.asdvdv);
 let a = 1;
 return 133+244;
 let __b_qwc13 =-2.4124355;
@@ -62,7 +66,7 @@ for __i_j:  !!-!(_q__q_1+123314.4441+caller(1,2,444+__1__31aa)){
     }
     }
     let b = exile;
-    let a.b.c.d.e.d.f=  true;
+    let a=  true;
     if teer{
         while teer{
         let xxx = uuu;
@@ -81,7 +85,7 @@ let xxx = uuu;
         let zzz__ = "qwee";
     }
         for __i_j:  _q__q_1{
-            let _a.a__az.__1_nvldvf.PAojofd=-114.514*bash*_zsh*teer*empty*somebody(excel, (1+3.1415));
+            let _aaa__asdasd=-114.514*bash*_zsh*teer*empty*somebody(excel, (1+3.1415));
             let b = exile;
             let aaa_1331=  hello.compile.runtime.typing.__checked_never;
             return empty;
