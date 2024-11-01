@@ -60,7 +60,23 @@ fn test_gc_cyc() {
 
     hp.gc(vec![c, d]);
     dbg!(&hp.objs);
+    let mut iter = hp.objs.iter();
+    assert!(iter.next().unwrap().is_some());
+    assert!(iter.next().unwrap().is_none());
+    assert!(iter.next().unwrap().is_some());
+    assert!(iter.next().unwrap().is_none());
+    assert!(iter.next().unwrap().is_some());
+    assert!(iter.next().unwrap().is_some());
+    assert!(iter.next().unwrap().is_some());
 
     hp.gc(vec![c]);
     dbg!(&hp.objs);
+    let mut iter = hp.objs.iter();
+    assert!(iter.next().unwrap().is_none());
+    assert!(iter.next().unwrap().is_none());
+    assert!(iter.next().unwrap().is_some());
+    assert!(iter.next().unwrap().is_none());
+    assert!(iter.next().unwrap().is_none());
+    assert!(iter.next().unwrap().is_none());
+    assert!(iter.next().unwrap().is_none());
 }

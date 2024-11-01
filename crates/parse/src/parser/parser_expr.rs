@@ -192,6 +192,15 @@ impl ExprTokens {
     }
 
     pub fn parse_atom(&mut self) -> ParserResult<ExprNode> {
+        // try to parse new
+        if let Token::New = self.current() {
+            if let Token::Identifier(typename) = self.next_nth(1)? {
+                // offset cur pointer
+                self.cur += 2;
+                return Ok(ExprNode::New(typename));
+            }
+        }
+
         // call preceed identifier
         if let Token::Identifier(ident) = self.current() {
             if self.cur + 1 >= self.tokens.len() {

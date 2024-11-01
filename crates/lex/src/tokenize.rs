@@ -83,6 +83,7 @@ impl IntoTokenIterator for pest::iterators::Pair<'_, Rule> {
                     Rule::r_for => Token::For,
                     Rule::r_while => Token::While,
                     Rule::r_return => Token::Return,
+                    Rule::r_new => Token::New,
 
                     // identifier
                     Rule::ident => Token::Identifier(str_repr.to_string()),

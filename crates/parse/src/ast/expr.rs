@@ -11,6 +11,7 @@ pub enum ExprNode {
     // atomic
     Literal(Literal),
     Identifer(String),
+    New(String),
     Member {
         base: String,
         members: Vec<String>,

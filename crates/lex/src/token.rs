@@ -71,6 +71,7 @@ pub enum Token {
     For,
     While,
     Return,
+    New,
 
     //
     Identifier(String),

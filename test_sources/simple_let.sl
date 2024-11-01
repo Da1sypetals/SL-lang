@@ -6,6 +6,8 @@ model b{
    a,b,c,az, as, e,f,
 }
 
+let a = new a;
+let v = a+(new a+b+(a(new a, v, c)))
 
 let q.w.e.r=1;
 let q=133.13;

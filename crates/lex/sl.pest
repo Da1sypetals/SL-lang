@@ -104,6 +104,7 @@ r_print  = { "print" }
 r_for    = { "for" }
 r_while  = { "while" }
 r_return = { "return" }
+r_new    = { "new" }
 
 reserved = _{
     r_let
@@ -116,6 +117,7 @@ reserved = _{
   | r_for
   | r_while
   | r_return
+  | r_new
 }
 
 ident_start =  { ASCII_ALPHA | "_" }
