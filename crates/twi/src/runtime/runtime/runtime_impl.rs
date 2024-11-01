@@ -48,16 +48,15 @@ impl Runtime {
         Err(TwiError::MainNotFound)
     }
 
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> TwiResult<()> {
         //
-        for stmt in &self.program {
+        for stmt in self.program.clone() {
             let stmt = stmt.clone();
             //
             match stmt {
-                StmtNode::Let {
-                    ident: target,
-                    expr,
-                } => todo!(),
+                StmtNode::Let { ident, expr } => {
+                    self.exec_let(ident, expr)?;
+                }
                 StmtNode::Expression { expr } => todo!(),
                 StmtNode::Return { expr } => todo!(),
                 StmtNode::Print { expr } => todo!(),
@@ -75,5 +74,6 @@ impl Runtime {
                 StmtNode::Assign { target, expr } => todo!(),
             }
         }
+        Ok(())
     }
 }

@@ -10,6 +10,7 @@ use std::{
 
 pub type Collector = Deque<Object>;
 
+#[derive(Debug)]
 pub struct Heap {
     pub(crate) free: BTreeSet<usize>,
     pub(crate) objs: Vec<Option<ObjectHandle>>,
@@ -29,7 +30,7 @@ impl Heap {
         let handle = self.objs[obj.hid].as_ref().unwrap();
         let obj = unsafe { &*handle.ptr };
         match obj {
-            ObjectInner::Model {    
+            ObjectInner::Model {
                 model_name: _,
                 fields,
             } => {

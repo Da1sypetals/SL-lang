@@ -1,4 +1,4 @@
-use std::collections::{btree_map::VacantEntry, BTreeMap};
+use std::collections::BTreeMap;
 
 use crate::runtime::gc::objects::Object;
 

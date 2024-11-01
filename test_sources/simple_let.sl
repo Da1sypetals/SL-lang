@@ -6,6 +6,11 @@ model b{
    a,b,c,az, as, e,f,
 }
 
+func aasdas(){
+    let a = 1;
+    asdfa = empty;
+}
+
 let a = new a;
 let v = a+(new a+b+(a(new a, v, c)))
 

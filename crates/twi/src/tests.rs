@@ -10,7 +10,7 @@ fn test_rt_base() {
     std::env::set_var("RUST_LOG", "trace");
     pretty_env_logger::init();
 
-    let tokens = sl_parse_file("../../test_sources/simple_let.sl");
+    let tokens = sl_parse_file("../../test_sources/exec_0.sl");
     let root = Parser::new_from_iter(tokens).parse_stmt();
     let root = match root {
         Ok(r) => r,
@@ -21,7 +21,7 @@ fn test_rt_base() {
     };
 
     let rt = Runtime::try_new(root);
-    let rt = match rt {
+    let mut rt = match rt {
         Ok(rt) => rt,
         Err(e) => {
             eprintln!("Preprocess error: {:?}", e);
@@ -29,5 +29,7 @@ fn test_rt_base() {
         }
     };
 
-    
+    rt.run().unwrap();
+    dbg!(rt.scopes);
+    dbg!(rt.heap);
 }

@@ -542,15 +542,28 @@ impl Parser {
 
     pub fn parse_func(&self) -> ParserResult<ParserStep> {
         if let (Token::Identifier(name), Token::Lpar) = (self.next_nth(1), self.next_nth(2)) {
+            // no param
             let mut ipeek = 3;
             let mut params = Vec::new();
             // parse param list
             loop {
-                if let Token::Identifier(param) = self.next_nth(ipeek) {
-                    if params.contains(&param) {
-                        return Err(ParserError::DuplicateArg(param));
-                    } else {
-                        params.push(param);
+                match self.next_nth(ipeek) {
+                    Token::Identifier(param) => {
+                        if params.contains(&param) {
+                            return Err(ParserError::DuplicateArg(param));
+                        } else {
+                            params.push(param);
+                        }
+                    }
+                    Token::Rpar => {
+                        ipeek += 1;
+                        break;
+                    }
+                    token => {
+                        return Err(ParserError::InvalidSyntax(format!(
+                            "Expected identifier of rpar, got {:?}",
+                            token
+                        )))
                     }
                 }
                 let sep = self.next_nth(ipeek + 1);

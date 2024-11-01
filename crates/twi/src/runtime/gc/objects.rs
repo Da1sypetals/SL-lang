@@ -1,10 +1,6 @@
-use std::collections::BTreeMap;
-
 use lex::token::teer;
-use lifo::Lifo;
 use parse::ast::stmt::StmtNode;
-
-use super::gc::{Collector, Heap};
+use std::collections::BTreeMap;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Object {
