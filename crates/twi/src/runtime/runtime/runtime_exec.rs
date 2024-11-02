@@ -12,7 +12,7 @@ use crate::{
     scope::scope::ScopeType,
 };
 
-use super::runtime::{Eval, Runtime};
+use super::runtime::Runtime;
 
 impl Runtime {
     pub fn exec_let(&mut self, ident: String, expr: ExprNode) -> TwiResult<()> {
@@ -23,7 +23,8 @@ impl Runtime {
             return Err(TwiError::DuplicateLocalBind(ident));
         }
         let val = self.eval(expr)?;
-        self.cur_scope().add(ident, val);
+        self.cur_scope_mut().add(ident, val);
+        // dbg!(&self.cur_scope());
 
         Ok(())
     }
@@ -37,11 +38,11 @@ impl Runtime {
         // for sc in &self.scopes {
         //     dbg!(&sc.vars);
         // }
-        if self.cur_scope().vars.contains_key(&name) {
+        if self.cur_scope_mut().vars.contains_key(&name) {
             return Err(TwiError::DuplicateLocalBind(name));
         }
         let val = self.heap.alloc(ObjectInner::Func { params, body });
-        self.cur_scope().add(name, val);
+        self.cur_scope_mut().add(name, val);
 
         Ok(())
     }
@@ -65,13 +66,12 @@ impl Runtime {
         if let Value::Int(n) = val {
             for count in 0..n {
                 // each iteration is a scope
-                self.enter_scope(ScopeType::Block);
+                let sg = self.enter_scope(ScopeType::Block);
                 // define iter counter
                 self.exec_let(iter.clone(), ExprNode::Literal(Literal::Int(count)))?;
                 for stmt in &body {
                     self.exec_stmt(stmt.clone())?;
                 }
-                self.exit_scope();
             }
             Ok(())
         } else {
@@ -91,11 +91,10 @@ impl Runtime {
             if let Value::Bool(cnd) = val {
                 // check if condition is true
                 if cnd {
-                    self.enter_scope(ScopeType::Block);
+                    let sg = self.enter_scope(ScopeType::Block);
                     for stmt in body.clone() {
                         self.exec_stmt(stmt.clone())?;
                     }
-                    self.exit_scope();
                 } else {
                     return Ok(());
                 }

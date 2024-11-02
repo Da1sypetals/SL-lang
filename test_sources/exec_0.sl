@@ -2,12 +2,21 @@ model Person {
     name, age, salary,
 }
 
+let e = 2.71828;
+
+func sayhi(thing) {
+    print "hello::::";
+    print thing;
+}
+
 func main() {
     let print_ra = false;
     let a = 3;
     let __ra = -1242.1222;
 
-    print __ra;
+    sayhi(__ra);
+    sayhi(e);
+    sayhi(a);
     
     func print_abn(a, na, b, nb) {
         for i: na {
@@ -20,6 +29,15 @@ func main() {
         }
     }
 
+    print_abn(true, 2, false, 2);
+
+
+    1883.1241;
+    -1242;
+    nil;
+    excel;
+    false;
+
     let sal = 5999;
     let p0 = new Person;
     p0.age = -19.6;
@@ -27,7 +45,22 @@ func main() {
     print p0;
     sal = 8888;
     print p0;
+
+    let z = new Person;
+
+    p0.name = z;
+    z.name = "candice";
+    p0.name.salary = 666666;
+    # z.salary = p0;
+
+    print "-----------------------";
+    print "-----------------------";
+
+    print z;
+    print p0;
     
+    p0.name.salary = z;
+    # print p0;
 
     let prx = print_abn;
 
@@ -65,6 +98,6 @@ func main() {
     let b = 2;
     print "B = ";
     print b;
-    print z;
+    print __ww__;
     print b;
 }

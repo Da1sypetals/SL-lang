@@ -27,7 +27,7 @@ fn test_rt_base() {
     let root = match root {
         Ok(r) => r,
         Err(e) => {
-            eprintln!("\n[Compiler information] Failed to compile: {:?}\n", e);
+            eprintln!("\n[Compiler information] Failed to compile: {}\n", e);
             std::process::exit(0);
         }
     };
@@ -48,6 +48,6 @@ fn test_rt_base() {
         println!("{}", msg.red());
         std::process::exit(0);
     }
-    dbg!(rt.scopes);
-    dbg!(rt.heap);
+    // dbg!(rt.scopes);
+    // dbg!(rt.heap);
 }

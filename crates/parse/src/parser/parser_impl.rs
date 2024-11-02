@@ -11,7 +11,7 @@ use crate::{
     errors::{ParserError, ParserResult},
 };
 
-use super::parser::Parser;
+use super::{parser::Parser, parser_expr};
 
 pub struct ParserStep {
     stmt: StmtNode,
@@ -65,7 +65,17 @@ impl Parser {
                 Token::While => self.parse_while(),
                 Token::Lbrace => self.parse_scope(),
                 Token::Eof => break,
-                Token::Identifier(_) => self.parse_assign(),
+                Token::Identifier(_) => self.parse_ident(),
+
+                // expression statement
+                Token::Int(_) => self.parse_expression_stmt(),
+                Token::Float(_) => self.parse_expression_stmt(),
+                Token::String(_) => self.parse_expression_stmt(),
+                Token::Bool(_) => self.parse_expression_stmt(),
+                Token::Teer(_) => self.parse_expression_stmt(),
+                Token::Nil => self.parse_expression_stmt(),
+
+                // other
                 token => {
                     return Err(ParserError::InvalidSyntax(format!(
                         "Starting token: {:?}, Parse an 'expression statement'",
@@ -180,7 +190,7 @@ impl Parser {
                     Token::Assign => break 'parse_members,
                     token => {
                         return Err(ParserError::InvalidSyntax(format!(
-                            "Invalid member seperator: {:?}",
+                            "Invalid member separator: {:?}",
                             token
                         )));
                     }
@@ -373,7 +383,7 @@ impl Parser {
                     body_tokens.push(other);
                 }
             }
-            dbg!(n_lbr);
+            // dbg!(n_lbr);
         }
         let len = body_tokens.len();
         let body = Parser::new(body_tokens).parse_stmt()?.statements;
@@ -407,7 +417,7 @@ impl Parser {
                     body_tokens.push(other);
                 }
             }
-            dbg!(n_lbr);
+            // dbg!(n_lbr);
         }
         let len = body_tokens.len();
         let body = Parser::new(body_tokens).parse_stmt()?.statements;
@@ -612,7 +622,7 @@ impl Parser {
                         body_tokens.push(other);
                     }
                 }
-                dbg!(n_lbr);
+                // dbg!(n_lbr);
             }
             let len = body_tokens.len();
             let body = Parser::new(body_tokens).parse_stmt()?.statements;
@@ -659,5 +669,53 @@ impl Parser {
             }
         }
         Err(ParserError::InvalidSyntax("Model def".to_string()))
+    }
+
+    pub fn parse_expression_stmt(&self) -> ParserResult<ParserStep> {
+        // match trailing ;
+        let mut expr_tokens = Vec::new();
+        for i in 0.. {
+            match self.next_nth(i) {
+                Token::Eof => {
+                    return Err(ParserError::InvalidSyntax("Return".to_string()));
+                }
+                Token::Semicolon => {
+                    break;
+                }
+                other => {
+                    expr_tokens.push(other);
+                }
+            }
+        }
+
+        // try parse intermediate tokens into expr
+        let len = expr_tokens.len();
+        if let Ok(expr) = expr_tokens.try_into() {
+            return Ok(ParserStep {
+                stmt: StmtNode::Expression { expr },
+                step: 1 + len,
+            });
+        }
+
+        Err(crate::errors::ParserError::InvalidSyntax(
+            "Expression statement".to_string(),
+        ))
+    }
+
+    fn parse_ident(&self) -> ParserResult<ParserStep> {
+        for i in 0.. {
+            match self.next_nth(i) {
+                Token::Assign => return self.parse_assign(),
+                Token::Semicolon => return self.parse_expression_stmt(),
+                Token::Eof => return Err(ParserError::UnexpectedEof),
+                _ => {
+                    // continue
+                }
+            }
+        }
+
+        Err(ParserError::InvalidSyntax(
+            "Syntax error: invalid statement".into(),
+        ))
     }
 }

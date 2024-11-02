@@ -5,19 +5,11 @@ use parse::ast::{expr::ExprNode, root::Root, stmt::StmtNode};
 use crate::{
     errors::TwiResult,
     runtime::gc::{gc::Heap, objects::Object},
-    scope::scope::{Scope, ScopeType},
+    scope::{
+        scope::{Scope, ScopeType},
+        scope_guard::ScopeGuard,
+    },
 };
-
-pub trait Eval {
-    fn eval(&self) -> Object;
-}
-
-impl Eval for ExprNode {
-    fn eval(&self) -> Object {
-        // evaluate without context, reporting all identifier-like thing as runtime error.
-        todo!()
-    }
-}
 
 // ########## utils ###########################
 
@@ -53,20 +45,24 @@ impl Runtime {
         Ok(rt)
     }
 
-    pub fn cur_scope(&mut self) -> &mut Scope {
+    pub fn cur_scope(&self) -> &Scope {
+        self.scopes.last().expect("No scope???")
+    }
+
+    pub fn cur_scope_mut(&mut self) -> &mut Scope {
         self.scopes.last_mut().expect("No scope???")
     }
 
-    /// To achieve RAII, we have to hold a reference of `Runtime`
-    /// so we don't use RAII here.
-    pub fn enter_scope(&mut self, type_: ScopeType) {
+    /// Manage scope via RAII
+    #[must_use]
+    pub(crate) fn enter_scope(&mut self, type_: ScopeType) -> ScopeGuard {
         self.scopes.push(Scope {
             scope_type: type_,
             vars: BTreeMap::new(),
         });
-    }
 
-    pub fn exit_scope(&mut self) {
-        self.scopes.pop();
+        ScopeGuard {
+            rt: self as *mut Runtime,
+        }
     }
 }

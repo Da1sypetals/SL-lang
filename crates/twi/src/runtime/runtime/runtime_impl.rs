@@ -14,12 +14,9 @@ impl Runtime {
     //
 
     pub fn structure(statements: Vec<StmtNode>) -> TwiResult<Self> {
-        let mut models = BTreeMap::new();
-        let mut global_vars = BTreeMap::new();
-
         let mut rt = Self {
-            models,
-            global_vars,
+            models: BTreeMap::new(),
+            global_vars: BTreeMap::new(),
             program: Vec::new(),
             heap: Heap::new(),
             scopes: Vec::new(),
@@ -60,7 +57,7 @@ impl Runtime {
         Ok(())
     }
 
-    /// todo: assign, expr(eval), return
+    /// todo: return
     pub fn exec_stmt(&mut self, stmt: StmtNode) -> TwiResult<()> {
         match stmt {
             StmtNode::Let { ident, expr } => {
@@ -74,29 +71,28 @@ impl Runtime {
             StmtNode::While { cond, body } => {
                 self.exec_while(cond, body)?;
             }
-            StmtNode::Expression { expr } => todo!(),
+            StmtNode::Expression { expr } => {
+                self.eval(expr)?;
+            }
             StmtNode::Return { expr } => todo!(),
             StmtNode::If { cond, body } => {
                 //
-                self.enter_scope(ScopeType::Block);
+                let sg = self.enter_scope(ScopeType::Block);
                 self.exec_if_else(cond, body, Vec::new())?;
-                self.exit_scope();
             }
             StmtNode::IfElse {
                 cond,
                 if_body,
                 else_body,
             } => {
-                self.enter_scope(ScopeType::Block);
+                let sg = self.enter_scope(ScopeType::Block);
                 self.exec_if_else(cond, if_body, else_body)?;
-                self.exit_scope();
             }
             StmtNode::Scope { body } => {
-                self.enter_scope(ScopeType::Block);
+                let sg = self.enter_scope(ScopeType::Block);
                 for stmt in body {
                     self.exec_stmt(stmt.clone())?;
                 }
-                self.exit_scope();
             }
             StmtNode::FuncDef { name, params, body } => self.exec_funcdef(name, params, body)?,
             StmtNode::Model { name, fields } => {
