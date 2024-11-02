@@ -12,7 +12,13 @@ pub struct SlParser;
 
 pub fn sl_parse_file(filename: &str) -> TokenIterator {
     let unparsed_file = fs::read_to_string(filename).expect("cannot read file");
-    let tokens = SlParser::parse(Rule::source, &unparsed_file);
+    // filter comments away
+    let source_string = unparsed_file
+        .lines()
+        .filter(|line| !line.trim_start().starts_with('#'))
+        .collect::<Vec<&str>>()
+        .join("\n");
+    let tokens = SlParser::parse(Rule::source, &source_string);
     let tokens = match tokens {
         Ok(mut tokens) => tokens.next().unwrap(),
         Err(e) => {

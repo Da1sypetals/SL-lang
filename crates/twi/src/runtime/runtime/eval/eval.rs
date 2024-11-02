@@ -1,15 +1,32 @@
-use crate::runtime::{gc::objects::Object, runtime::runtime::Runtime};
+use crate::{
+    errors::{TwiError, TwiResult},
+    runtime::{gc::objects::Object, runtime::runtime::Runtime},
+    scope,
+};
 use parse::ast::expr::ExprNode;
 
 impl Runtime {
-    pub fn eval(&mut self, expr: ExprNode) -> Object {
+    pub fn eval(&mut self, expr: ExprNode) -> TwiResult<Object> {
         //
         match expr {
             ExprNode::Literal(literal) => {
                 //
-                self.parse_literal(literal)
+                Ok(self.parse_literal(literal))
             }
-            ExprNode::Identifer(_) => todo!(),
+            ExprNode::Identifer(ident) => {
+                // track back stack
+                for scope in self.scopes.iter().rev() {
+                    if let Some(obj) = scope.vars.get(&ident) {
+                        return Ok(*obj);
+                    }
+                }
+                // global
+                if let Some(var) = self.global_vars.get(&ident) {
+                    Ok(var.obj)
+                } else {
+                    Err(TwiError::IdentifierNotFound(ident))
+                }
+            }
             ExprNode::New(_) => todo!(),
             ExprNode::Member { base, members } => todo!(),
             ExprNode::Eq { left, right } => todo!(),

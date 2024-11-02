@@ -1,9 +1,21 @@
 use std::{fs, io::Write};
 
+use colored::Colorize;
 use lex::pest_parse::sl_parse_file;
 use parse::{display::print_stmt, parser::parser::Parser};
 
 use crate::runtime::runtime::runtime::Runtime;
+
+#[test]
+fn test_try() {
+    std::env::set_var("RUST_LOG", "trace");
+    pretty_env_logger::init();
+
+    let tokens = sl_parse_file("../../test_sources/exec_0.sl");
+    for t in tokens {
+        dbg!(t);
+    }
+}
 
 #[test]
 fn test_rt_base() {
@@ -29,7 +41,16 @@ fn test_rt_base() {
         }
     };
 
-    rt.run().unwrap();
+    println!(
+        "\n{}\n",
+        "=============== Program start ===============".blue()
+    );
+    let result = rt.run();
+    if let Err(e) = result {
+        let msg = format!("\n[SL runtime error]\n>>  {}\n>>  Program exited.", e);
+        println!("{}", msg.red());
+        std::process::exit(0);
+    }
     dbg!(rt.scopes);
     dbg!(rt.heap);
 }

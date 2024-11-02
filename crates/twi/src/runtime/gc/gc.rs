@@ -1,6 +1,9 @@
 use crate::errors::{TwiError, TwiResult};
 
-use super::objects::{self, Object, ObjectHandle, ObjectInner};
+use super::{
+    objects::{self, Object, ObjectHandle, ObjectInner},
+    value::Value,
+};
 use lifo::{Deque, Lifo};
 use std::{
     alloc::{dealloc, Layout},
@@ -23,6 +26,22 @@ impl Heap {
             free: BTreeSet::new(),
             objs: Vec::new(),
             col: Collector::new(),
+        }
+    }
+
+    pub fn get_value(&self, obj: Object) -> Value {
+        //
+        let handle = self.objs[obj.hid].as_ref().unwrap();
+        let obj = unsafe { &*handle.ptr };
+        match obj {
+            ObjectInner::Nil => Value::Nil,
+            ObjectInner::Int(x) => Value::Int(*x),
+            ObjectInner::Float(x) => Value::Float(*x),
+            ObjectInner::Teer(x) => Value::Teer(*x),
+            ObjectInner::Bool(x) => Value::Bool(*x),
+            ObjectInner::String(x) => Value::String(x.clone()),
+            ObjectInner::Func { params, stmts } => todo!(),
+            ObjectInner::Model { model_name, fields } => todo!(),
         }
     }
 

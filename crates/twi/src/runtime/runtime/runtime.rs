@@ -1,9 +1,11 @@
+use std::collections::BTreeMap;
+
 use parse::ast::{expr::ExprNode, root::Root, stmt::StmtNode};
 
 use crate::{
     errors::TwiResult,
     runtime::gc::{gc::Heap, objects::Object},
-    scope::scope::Scope,
+    scope::scope::{Scope, ScopeType},
 };
 
 pub trait Eval {
@@ -25,13 +27,11 @@ pub struct Model {
 }
 
 pub struct GlobalFunc {
-    pub(crate) name: String,
     pub(crate) body: Vec<StmtNode>,
 }
 
 pub struct GlobalVar {
-    pub(crate) name: String,
-    pub(crate) val: Object,
+    pub(crate) obj: Object,
 }
 
 // ########################################################
@@ -40,8 +40,8 @@ pub struct GlobalVar {
 
 pub struct Runtime {
     pub(crate) models: Vec<Model>,
-    pub(crate) global_funcs: Vec<GlobalFunc>,
-    pub(crate) global_vars: Vec<GlobalVar>,
+    pub(crate) global_funcs: BTreeMap<String, GlobalFunc>,
+    pub(crate) global_vars: BTreeMap<String, GlobalVar>,
 
     pub(crate) program: Vec<StmtNode>,
 
@@ -60,5 +60,18 @@ impl Runtime {
 
     pub fn cur_scope(&mut self) -> &mut Scope {
         self.scopes.last_mut().expect("No scope???")
+    }
+
+    /// To achieve RAII, we have to hold a reference of `Runtime`
+    /// so we don't use RAII here.
+    pub fn enter_scope(&mut self, type_: ScopeType) {
+        self.scopes.push(Scope {
+            scope_type: type_,
+            vars: BTreeMap::new(),
+        });
+    }
+
+    pub fn exit_scope(&mut self) {
+        self.scopes.pop();
     }
 }

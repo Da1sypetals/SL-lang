@@ -63,13 +63,14 @@ impl Parser {
                 Token::Print => self.parse_print(),
                 Token::For => self.parse_for(),
                 Token::While => self.parse_while(),
+                Token::Lbrace => self.parse_scope(),
                 Token::Eof => break,
                 Token::Identifier(_) => self.parse_assign(),
                 token => {
-                    todo!(
+                    return Err(ParserError::InvalidSyntax(format!(
                         "Starting token: {:?}, Parse an 'expression statement'",
                         token
-                    )
+                    )));
                 }
             };
 

@@ -94,17 +94,17 @@ sign = _{
 
 // r_ : reserved
 // model: for defining (heap allocated) struct
-r_let    = { "let" }
-r_func   = { "func" }
-r_typeof = { "typeof" }
-r_if     = { "if" }
-r_else   = { "else" }
-r_model  = { "model" }
-r_print  = { "print" }
-r_for    = { "for" }
-r_while  = { "while" }
-r_return = { "return" }
-r_new    = { "new" }
+r_let    = @{ "let" ~ !ident_char }
+r_func   = @{ "func" ~ !ident_char }
+r_typeof = @{ "typeof" ~ !ident_char }
+r_if     = @{ "if" ~ !ident_char }
+r_else   = @{ "else" ~ !ident_char }
+r_model  = @{ "model" ~ !ident_char }
+r_print  = @{ "print" ~ !ident_char }
+r_for    = @{ "for" ~ !ident_char }
+r_while  = @{ "while" ~ !ident_char }
+r_return = @{ "return" ~ !ident_char }
+r_new    = @{ "new" ~ !ident_char }
 
 reserved = _{
     r_let
