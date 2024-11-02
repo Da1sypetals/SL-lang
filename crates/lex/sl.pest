@@ -138,3 +138,4 @@ source = { SOI ~ token* ~ EOI }
 
 // others
 WHITESPACE = _{ " " | "\n" }
+COMMENT    = _{ "<//" ~ (!"//>" ~ ANY)* ~ "//>" }

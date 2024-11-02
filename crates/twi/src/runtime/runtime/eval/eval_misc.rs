@@ -19,7 +19,7 @@ impl Runtime {
         self.heap.alloc(lit.into())
     }
 
-    pub fn parse_model(&mut self, typename: String) -> TwiResult<Object> {
+    pub fn eval_model(&mut self, typename: String) -> TwiResult<Object> {
         if let Some(model) = self.models.get(&typename) {
             // initialize all fields to nil
             let instance_inner: BTreeMap<_, _> = model
@@ -43,19 +43,30 @@ impl Runtime {
     pub fn eval_call(&mut self, funcname: String, args: Vec<ExprNode>) -> TwiResult<Object> {
         let callable = self.getvar(funcname)?;
         let func = self.heap.get_value(callable);
-        if let Value::Func { params, body } = func {
+        if let Value::Func {
+            params,
+            hid: _,
+            body,
+        } = func
+        {
             if params.len() != args.len() {
                 return Err(TwiError::ArgNumMismatch {
                     expected: params.len(),
                     got: args.len(),
                 });
             }
+
+            // Do not use iterator/adapter here
+            // since we need to do error prop
+            let mut args_val = Vec::new();
+            for arg in args {
+                args_val.push(self.eval(arg)?);
+            }
             {
                 // start a call
                 let sg = self.enter_scope(ScopeType::Call);
                 // push all arguments
-                for (name, value) in params.into_iter().zip(args) {
-                    let val = self.eval_at_lvl(value, 1)?;
+                for (name, val) in params.into_iter().zip(args_val) {
                     self.cur_scope_mut().add(name, val);
                 }
                 // execute
@@ -64,6 +75,8 @@ impl Runtime {
                 }
                 // exit scope
             }
+
+            // MARKER: function return value
 
             let nil = self.heap.alloc(ObjectInner::Nil);
             // TODO: return value is here
@@ -89,8 +102,8 @@ impl Runtime {
         if let Some(var) = self.global_vars.get(&ident) {
             Ok(var.obj)
         } else {
-            dbg!(self.cur_scope());
-            dbg!(self.scopes.len());
+            // dbg!(self.cur_scope());
+            // dbg!(self.scopes.len());
             Err(TwiError::IdentifierNotFound(ident))
         }
     }

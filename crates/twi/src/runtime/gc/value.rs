@@ -13,11 +13,12 @@ pub enum Value {
     String(String),
     Func {
         params: Vec<String>,
+        hid: usize,
         body: Vec<StmtNode>,
     },
     Model {
         name: String,
-        fields: BTreeMap<String, Value>,
+        hid: usize,
     },
 }
 

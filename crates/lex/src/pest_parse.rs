@@ -1,8 +1,8 @@
-use std::fs;
-
 use log::error;
 use pest::Parser;
 use pest_derive::Parser;
+use regex::Regex;
+use std::fs;
 
 use crate::tokenize::{IntoTokenIterator, TokenIterator};
 
@@ -26,6 +26,7 @@ pub fn sl_parse_file(filename: &str) -> TokenIterator {
             std::process::exit(0);
         }
     };
+    // dbg!(&tokens);
 
     tokens.into_token_iter()
 }

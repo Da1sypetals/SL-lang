@@ -1,86 +1,114 @@
 
-if let Token::Eq = self.current() {
-    eq_continue = true;
-    self.cur += 1;
-    let right = self.parse_add()?;
-    left = ExprNode::eq(left, right);
-    continue;
+pub(crate) fn eval_lt(&mut self, left: ExprNode, right: ExprNode) -> TwiResult<Object> {
+    let ord = self._order(left, right)?;
+    Ok(self.heap.alloc(ObjectInner::Bool(ord.lt())))
 }
 
 
-if let Token::Neq = self.current() {
-    eq_continue = true;
-    self.cur += 1;
-    let right = self.parse_add()?;
-    left = ExprNode::neq(left, right);
-    continue;
-}
-
-if let Token::Gt = self.current() {
-    cmp_continue = true;
-    self.cur += 1;
-    let right = self.parse_add()?;
-    left = ExprNode::gt(left, right);
-    continue;
+pub(crate) fn eval_gt(&mut self, left: ExprNode, right: ExprNode) -> TwiResult<Object> {
+    let ord = self._order(left, right)?;
+    Ok(self.heap.alloc(ObjectInner::Bool(ord.gt())))
 }
 
 
-if let Token::Geq = self.current() {
-    cmp_continue = true;
-    self.cur += 1;
-    let right = self.parse_add()?;
-    left = ExprNode::geq(left, right);
-    continue;
+pub(crate) fn eval_leq(&mut self, left: ExprNode, right: ExprNode) -> TwiResult<Object> {
+    let ord = self._order(left, right)?;
+    Ok(self.heap.alloc(ObjectInner::Bool(ord.leq())))
 }
 
 
-if let Token::Lt = self.current() {
-    cmp_continue = true;
-    self.cur += 1;
-    let right = self.parse_add()?;
-    left = ExprNode::lt(left, right);
-    continue;
+pub(crate) fn eval_geq(&mut self, left: ExprNode, right: ExprNode) -> TwiResult<Object> {
+    let ord = self._order(left, right)?;
+    Ok(self.heap.alloc(ObjectInner::Bool(ord.geq())))
 }
 
+pub(crate) fn eval_add(&mut self, left: ExprNode, right: ExprNode) -> TwiResult<Object> {
+        let lobj = self.eval(left)?;
+        let robj = self.eval(right)?;
 
-if let Token::Leq = self.current() {
-    cmp_continue = true;
-    self.cur += 1;
-    let right = self.parse_add()?;
-    left = ExprNode::leq(left, right);
-    continue;
-}
+        let lval = self.heap.get_value(lobj);
+        let rval = self.heap.get_value(robj);
 
-if let Token::Plus = self.current() {
-    add_continue = true;
-    self.cur += 1;
-    let right = self.parse_add()?;
-    left = ExprNode::add(left, right);
-    continue;
-}
-
-
-if let Token::Minus = self.current() {
-    add_continue = true;
-    self.cur += 1;
-    let right = self.parse_add()?;
-    left = ExprNode::minus(left, right);
-    continue;
-}
-
-if let Token::Star = self.current() {
-    mul_continue = true;
-    self.cur += 1;
-    let right = self.parse_add()?;
-    left = ExprNode::mul(left, right);
-    continue;
-}
+        match (lval, rval) {
+            (Value::Int(i1), Value::Int(i2)) => {
+                //
+                Ok(self.heap.alloc(ObjectInner::Int(i1 + i2)))
+            }
+            (Value::Float(f1), Value::Float(f2)) => {
+                Ok(self.heap.alloc(ObjectInner::Float(f1 + f2)))
+            }
+            (l, r) => Err(TwiError::IncompatibleBinopType {
+                left: l.to_string(),
+                right: r.to_string(),
+            }),
+        }
+    }
 
 
-if let Token::Slash = self.current() {
-    mul_continue = true;
-    self.cur += 1;
-    let right = self.parse_add()?;
-    left = ExprNode::div(left, right);
-    continue;
-}
+pub(crate) fn eval_minus(&mut self, left: ExprNode, right: ExprNode) -> TwiResult<Object> {
+        let lobj = self.eval(left)?;
+        let robj = self.eval(right)?;
+
+        let lval = self.heap.get_value(lobj);
+        let rval = self.heap.get_value(robj);
+
+        match (lval, rval) {
+            (Value::Int(i1), Value::Int(i2)) => {
+                //
+                Ok(self.heap.alloc(ObjectInner::Int(i1 - i2)))
+            }
+            (Value::Float(f1), Value::Float(f2)) => {
+                Ok(self.heap.alloc(ObjectInner::Float(f1 - f2)))
+            }
+            (l, r) => Err(TwiError::IncompatibleBinopType {
+                left: l.to_string(),
+                right: r.to_string(),
+            }),
+        }
+    }
+
+
+pub(crate) fn eval_mul(&mut self, left: ExprNode, right: ExprNode) -> TwiResult<Object> {
+        let lobj = self.eval(left)?;
+        let robj = self.eval(right)?;
+
+        let lval = self.heap.get_value(lobj);
+        let rval = self.heap.get_value(robj);
+
+        match (lval, rval) {
+            (Value::Int(i1), Value::Int(i2)) => {
+                //
+                Ok(self.heap.alloc(ObjectInner::Int(i1 * i2)))
+            }
+            (Value::Float(f1), Value::Float(f2)) => {
+                Ok(self.heap.alloc(ObjectInner::Float(f1 * f2)))
+            }
+            (l, r) => Err(TwiError::IncompatibleBinopType {
+                left: l.to_string(),
+                right: r.to_string(),
+            }),
+        }
+    }
+
+
+pub(crate) fn eval_div(&mut self, left: ExprNode, right: ExprNode) -> TwiResult<Object> {
+        let lobj = self.eval(left)?;
+        let robj = self.eval(right)?;
+
+        let lval = self.heap.get_value(lobj);
+        let rval = self.heap.get_value(robj);
+
+        match (lval, rval) {
+            (Value::Int(i1), Value::Int(i2)) => {
+                //
+                Ok(self.heap.alloc(ObjectInner::Int(i1 / i2)))
+            }
+            (Value::Float(f1), Value::Float(f2)) => {
+                Ok(self.heap.alloc(ObjectInner::Float(f1 / f2)))
+            }
+            (l, r) => Err(TwiError::IncompatibleBinopType {
+                left: l.to_string(),
+                right: r.to_string(),
+            }),
+        }
+    }

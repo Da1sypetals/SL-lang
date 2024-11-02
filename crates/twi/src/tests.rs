@@ -41,7 +41,7 @@ fn test_rt_base() {
         }
     };
 
-    println!("\n{}\n", "[SL info] Program started".blue());
+    println!("\n{}\n", "[SL info] Program started".green());
     let result = rt.run();
     if let Err(e) = result {
         let msg = format!("\n[SL runtime error]\n>>  {}\n>>  Program exited.", e);

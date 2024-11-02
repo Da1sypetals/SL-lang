@@ -14,10 +14,32 @@ func main() {
     let a = 3;
     let __ra = -1242.1222;
 
+    let psn = new Person;
+    let boy = new Person;
+
+    boy.age = 14.33;
+    psn.age = boy;
+
+    let qq = new Person;
+    let ww = new Person;
+    ww.age = qq;
+    let ee = qq;
+
+    print qq==ww;
+    print qq==ee;
+    print qq;
+    print ww;
+
+    ee.age = 1034;
+    print qq.age;
+
     sayhi(__ra);
-    sayhi(e);
+    sayhi(e * 4.0 * psn.age.age);
     sayhi(a);
+    sayhi(e == 2.71828);
+    sayhi(e == 2.72);
     
+    <//
     func print_abn(a, na, b, nb) {
         for i: na {
             print a;
@@ -28,7 +50,7 @@ func main() {
             print b;
         }
     }
-
+    
     print_abn(true, 2, false, 2);
 
 
@@ -100,4 +122,5 @@ func main() {
     print b;
     print __ww__;
     print b;
+    //>
 }

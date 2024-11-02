@@ -27,6 +27,13 @@ pub enum TwiError {
     #[error("{:?} is not a func, cannot call", .0)]
     CannotCall(String),
 
+    // ############### type ###############
+    #[error("Incompatible binary operation type: left {}, right: {}", left, right)]
+    IncompatibleBinopType { left: String, right: String },
+
+    #[error("Incompatible unary operation type: {}", .0)]
+    IncompatibleUnopType(String),
+
     // ############### others ###############
     #[error("Invalid global definition: {} is not allowed in global scope", .0)]
     InvalidGlobalDefinition(String),

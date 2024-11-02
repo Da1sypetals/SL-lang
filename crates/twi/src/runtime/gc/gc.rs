@@ -32,8 +32,8 @@ impl Heap {
     pub fn get_value(&self, obj: Object) -> Value {
         //
         let handle = self.objs[obj.hid].as_ref().unwrap();
-        let obj = unsafe { &*handle.ptr };
-        match obj {
+        let obj_inner = unsafe { &*handle.ptr };
+        match obj_inner {
             ObjectInner::Nil => Value::Nil,
             ObjectInner::Int(x) => Value::Int(*x),
             ObjectInner::Float(x) => Value::Float(*x),
@@ -42,14 +42,15 @@ impl Heap {
             ObjectInner::String(x) => Value::String(x.clone()),
             ObjectInner::Func { params, body } => Value::Func {
                 params: params.clone(),
+                hid: obj.hid,
                 body: body.clone(),
             },
-            ObjectInner::Model { model_name, fields } => Value::Model {
+            ObjectInner::Model {
+                model_name,
+                fields: _,
+            } => Value::Model {
                 name: model_name.clone(),
-                fields: fields
-                    .into_iter()
-                    .map(|(name, &obj)| (name.clone(), self.get_value(obj)))
-                    .collect(),
+                hid: obj.hid,
             },
         }
     }
