@@ -74,7 +74,10 @@ impl Runtime {
             StmtNode::Expression { expr } => {
                 self.eval(expr)?;
             }
-            StmtNode::Return { expr } => todo!(),
+            StmtNode::Return { expr } => {
+                // return value as error
+                return Err(TwiError::Return(self.eval(expr)?));
+            }
             StmtNode::If { cond, body } => {
                 //
                 let sg = self.enter_scope(ScopeType::Block);

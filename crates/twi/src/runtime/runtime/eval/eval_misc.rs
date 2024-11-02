@@ -71,7 +71,15 @@ impl Runtime {
                 }
                 // execute
                 for stmt in body {
-                    self.exec_stmt(stmt)?;
+                    let res = self.exec_stmt(stmt);
+                    match res {
+                        Ok(_) => {}
+                        Err(TwiError::Return(val)) => {
+                            //
+                            return Ok(val);
+                        }
+                        Err(e) => return Err(e),
+                    }
                 }
                 // exit scope
             }

@@ -5,11 +5,35 @@ model Person {
 let e = 2.71828;
 
 func sayhi(thing) {
-    print "hello::::";
+    print "<sayhi> hello::::";
     print thing;
 }
 
 func main() {
+
+    func loop(a) {
+        let i = 0;
+        while true {
+            if i >= a + 2 {
+                return i;
+            }
+            i = i + 2;
+        }
+    }
+
+    print "z=";
+    let z = loop(1);
+    print z;
+
+    func mult(a, b) {
+        print a;
+        print b;
+        return a * b;
+    }
+
+    print mult(1.414, -1.414);
+    print mult(12, 13);
+
     let print_ra = false;
     let a = 3;
     let __ra = -1242.1222;

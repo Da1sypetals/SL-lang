@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-use crate::runtime::gc::objects::ObjectInner;
+use crate::runtime::gc::objects::{Object, ObjectInner};
 
 #[derive(Debug, Error)]
 pub enum TwiError {
@@ -50,6 +50,9 @@ pub enum TwiError {
 
     #[error("Number of args mismatch: expected {}, got {}", expected, got)]
     ArgNumMismatch { expected: usize, got: usize },
+
+    #[error("Return value")]
+    Return(Object),
 }
 
 pub type TwiResult<T> = Result<T, TwiError>;

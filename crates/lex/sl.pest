@@ -14,7 +14,7 @@
 // numbers:
 // uint is not used directly
 uint  =  { "0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
-int   = @{ "-"? ~ ASCII_NONZERO_DIGIT ~ ASCII_DIGIT* }
+int   = @{ "0" | ("-"? ~ ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*) }
 float = @{ "-"? ~ uint ~ "." ~ ASCII_DIGIT+ }
 
 // string
