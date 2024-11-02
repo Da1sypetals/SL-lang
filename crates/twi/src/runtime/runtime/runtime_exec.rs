@@ -1,11 +1,14 @@
 use parse::{
-    ast::{expr::ExprNode, stmt::StmtNode},
+    ast::{
+        expr::ExprNode,
+        stmt::{Lvalue, StmtNode},
+    },
     types::literal::Literal,
 };
 
 use crate::{
     errors::{TwiError, TwiResult},
-    runtime::gc::value::Value,
+    runtime::gc::{objects::ObjectInner, value::Value},
     scope::scope::ScopeType,
 };
 
@@ -21,6 +24,24 @@ impl Runtime {
         }
         let val = self.eval(expr)?;
         self.cur_scope().add(ident, val);
+
+        Ok(())
+    }
+
+    pub fn exec_funcdef(
+        &mut self,
+        name: String,
+        params: Vec<String>,
+        body: Vec<StmtNode>,
+    ) -> TwiResult<()> {
+        // for sc in &self.scopes {
+        //     dbg!(&sc.vars);
+        // }
+        if self.cur_scope().vars.contains_key(&name) {
+            return Err(TwiError::DuplicateLocalBind(name));
+        }
+        let val = self.heap.alloc(ObjectInner::Func { params, body });
+        self.cur_scope().add(name, val);
 
         Ok(())
     }
@@ -61,6 +82,33 @@ impl Runtime {
         }
     }
 
+    pub fn exec_while(&mut self, cond: ExprNode, body: Vec<StmtNode>) -> TwiResult<()> {
+        loop {
+            let cond = self.eval(cond.clone())?;
+            let val = self.heap.get_value(cond);
+
+            // check if condition is of correct type
+            if let Value::Bool(cnd) = val {
+                // check if condition is true
+                if cnd {
+                    self.enter_scope(ScopeType::Block);
+                    for stmt in body.clone() {
+                        self.exec_stmt(stmt.clone())?;
+                    }
+                    self.exit_scope();
+                } else {
+                    return Ok(());
+                }
+            } else {
+                // incorrect type
+                return Err(TwiError::UnexpectedType {
+                    expected: "Bool".into(),
+                    got: val.to_string(),
+                });
+            }
+        }
+    }
+
     pub fn exec_if_else(
         &mut self,
         cond: ExprNode,
@@ -86,5 +134,23 @@ impl Runtime {
                 got: val.to_string(),
             })
         }
+    }
+
+    pub fn exec_assign(&mut self, target: Lvalue, expr: ExprNode) -> TwiResult<()> {
+        match target {
+            Lvalue::Identifier(ident) => {
+                // order is critical to fool borrow checker...
+                let val = self.eval(expr)?;
+                let objref = self.getvar_mut(ident)?;
+                *objref = val;
+            }
+            Lvalue::Member { base, members } => {
+                let val = self.eval(expr)?;
+                let mut obj = self.getvar(base)?;
+                obj.refs(&mut self.heap, members, val)?;
+            }
+        }
+
+        Ok(())
     }
 }

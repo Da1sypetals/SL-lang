@@ -41,7 +41,7 @@ fn test_gc_cyc() {
 
     // , ("world".to_string(), b)
 
-    let d = hp.alloc(ObjectInner::Model {
+    let mut d = hp.alloc(ObjectInner::Model {
         model_name: "Mdl".into(),
         fields: vec![("hello".to_string(), a), ("world".to_string(), b)]
             .into_iter()

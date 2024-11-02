@@ -24,7 +24,7 @@ pub enum ObjectInner {
     String(String),
     Func {
         params: Vec<String>,
-        stmts: Vec<StmtNode>,
+        body: Vec<StmtNode>,
     },
     Model {
         model_name: String,

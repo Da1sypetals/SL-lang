@@ -26,10 +26,6 @@ pub struct Model {
     pub(crate) fields: Vec<String>,
 }
 
-pub struct GlobalFunc {
-    pub(crate) body: Vec<StmtNode>,
-}
-
 pub struct GlobalVar {
     pub(crate) obj: Object,
 }
@@ -39,8 +35,7 @@ pub struct GlobalVar {
 // ########################################################
 
 pub struct Runtime {
-    pub(crate) models: Vec<Model>,
-    pub(crate) global_funcs: BTreeMap<String, GlobalFunc>,
+    pub(crate) models: BTreeMap<String, Model>,
     pub(crate) global_vars: BTreeMap<String, GlobalVar>,
 
     pub(crate) program: Vec<StmtNode>,

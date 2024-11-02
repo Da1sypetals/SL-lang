@@ -1,6 +1,7 @@
-use std::fmt::Display;
+use std::{collections::BTreeMap, fmt::Display};
 
 use lex::token::teer;
+use parse::ast::stmt::StmtNode;
 
 #[derive(Clone, Debug)]
 pub enum Value {
@@ -10,6 +11,14 @@ pub enum Value {
     Teer(teer),
     Bool(bool),
     String(String),
+    Func {
+        params: Vec<String>,
+        body: Vec<StmtNode>,
+    },
+    Model {
+        name: String,
+        fields: BTreeMap<String, Value>,
+    },
 }
 
 impl Display for Value {

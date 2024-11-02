@@ -36,8 +36,8 @@ impl Scope {
         self.vars.insert(ident, obj);
     }
 
-    pub fn get(&mut self, ident: String) -> Option<Object> {
-        self.vars.get(&ident).map(|x| *x)
+    pub fn get(&mut self, ident: &str) -> Option<Object> {
+        self.vars.get(ident).map(|x| *x)
     }
 }
 

@@ -40,8 +40,17 @@ impl Heap {
             ObjectInner::Teer(x) => Value::Teer(*x),
             ObjectInner::Bool(x) => Value::Bool(*x),
             ObjectInner::String(x) => Value::String(x.clone()),
-            ObjectInner::Func { params, stmts } => todo!(),
-            ObjectInner::Model { model_name, fields } => todo!(),
+            ObjectInner::Func { params, body } => Value::Func {
+                params: params.clone(),
+                body: body.clone(),
+            },
+            ObjectInner::Model { model_name, fields } => Value::Model {
+                name: model_name.clone(),
+                fields: fields
+                    .into_iter()
+                    .map(|(name, &obj)| (name.clone(), self.get_value(obj)))
+                    .collect(),
+            },
         }
     }
 
@@ -139,9 +148,11 @@ impl Object {
         handle.ptr
     }
 
-    pub fn refs(&self, heap: &mut Heap, members: Vec<String>, other: Object) -> TwiResult<()> {
+    /// ### Short for `references`
+    /// let the reference references other object
+    pub fn refs(&mut self, heap: &mut Heap, members: Vec<String>, other: Object) -> TwiResult<()> {
         if members.is_empty() {
-            return Err(TwiError::MemberNotFound("<null>".into()));
+            self.hid = other.hid;
         }
         let mut res = *self;
         let mut ptr = std::ptr::null_mut();
