@@ -19,6 +19,11 @@ pub enum Value {
     Model {
         name: String,
         hid: usize,
+        members: Vec<(String, Value)>,
+    },
+    ModelRef {
+        name: String,
+        hid: usize,
     },
 }
 

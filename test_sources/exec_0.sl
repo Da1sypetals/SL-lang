@@ -2,6 +2,10 @@ model Person {
     name, age, salary,
 }
 
+model Book {
+    name, isbn, _n_page,
+}
+
 let e = 2.71828;
 
 func sayhi(thing) {

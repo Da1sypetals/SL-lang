@@ -45,12 +45,27 @@ impl Heap {
                 hid: obj.hid,
                 body: body.clone(),
             },
-            ObjectInner::Model {
-                model_name,
-                fields: _,
-            } => Value::Model {
+            ObjectInner::Model { model_name, fields } => Value::Model {
                 name: model_name.clone(),
                 hid: obj.hid,
+                members: fields
+                    .iter()
+                    .map(|(field_name, field_obj)| {
+                        let handle = self.objs[field_obj.hid].as_ref().unwrap();
+                        let obj_inner = unsafe { &*handle.ptr };
+                        let val = match obj_inner {
+                            ObjectInner::Model {
+                                model_name,
+                                fields: _,
+                            } => Value::ModelRef {
+                                name: model_name.clone(),
+                                hid: field_obj.hid,
+                            },
+                            _ => self.get_value(*field_obj),
+                        };
+                        (field_name.clone(), val)
+                    })
+                    .collect(),
             },
         }
     }
