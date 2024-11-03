@@ -15,8 +15,10 @@ func main() {
         return fib(n - 1) + fib(n - 2) + fib(n - 3);
     }
 
-    let x = fib(24);
-    print x;
+    print 100 % 7;
+
+    # let x = fib(24);
+    # print x;
 
     <//
     func fib(n) {
