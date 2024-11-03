@@ -10,19 +10,30 @@ let e = 2.71828;
 
 func main() {
 
-    let b1 = new Book;
-    let b2 = new Book;
+    let p = new Person;
+    
+    {
+        let b = new Book;
+        b.name = "jane eyre";
+        p.name = b;
+        print p.name.name;
+    }
 
-    print b1;
-    print b2;
+    let a = 2;
 
-    # return "Success";
+    for i: 600000 {
+        let a = 1;
+        let q = 1;
+        let w = 1;
+        # let e = 1;
+    }
 
-    b1.name = b2;
-    b2.name = b1;
+    # print "a=";
+    # print a;
 
-    print "ok";
-    print b1;
-    print b2;
+    print "e=";
+    print e;
+    
+    # print p.name.name;
 
 }

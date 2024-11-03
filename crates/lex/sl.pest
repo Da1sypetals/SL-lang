@@ -128,8 +128,8 @@ ident       = @{ ident_start ~ ident_char* }
 // literal preceed sign, please mind the dot inside floats.
 token = _{
     reserved
-  | literal
   | sign
+  | literal
   | ident
 }
 
