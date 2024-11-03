@@ -42,7 +42,13 @@ impl Runtime {
 
             ExprNode::Packed(expr) => self.eval(*expr),
 
-            ExprNode::Call { name, args } => self.eval_call(name, args),
+            // ExprNode::Call { name, args } => self.eval_call(name, args),
+            ExprNode::Call { name, args } => {
+                let return_val = self.eval_call(name, args)?;
+                self.temp_ref(return_val);
+
+                Ok(return_val)
+            }
         }
     }
 }

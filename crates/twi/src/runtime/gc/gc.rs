@@ -30,8 +30,14 @@ impl Heap {
     }
 
     pub fn get_value(&self, obj: Object) -> Value {
+        // dbg!(obj.hid);
         //
-        let handle = self.objs[obj.hid].as_ref().unwrap();
+        let handle = self.objs[obj.hid].as_ref().expect(&format!(
+            "Internal error: deref dangling pointer, hid={}, free.len={}, objs.len={}",
+            obj.hid,
+            self.free.len(),
+            self.objs.len()
+        ));
         let obj_inner = unsafe { &*handle.ptr };
         match obj_inner {
             ObjectInner::Nil => Value::Nil,
@@ -100,7 +106,7 @@ impl Heap {
         let ptr = Box::into_raw(Box::new(obj_inner));
 
         // allocate heap id
-        let hid = if let Some(&hid) = self.free.first() {
+        let hid = if let Some(hid) = self.free.pop_first() {
             // allocate with free list
             self.objs[hid] = Some(ObjectHandle { alive: false, ptr });
             hid
@@ -121,18 +127,28 @@ impl Heap {
         }
 
         // sweep
-        for obj_opt in &mut self.objs {
+        for (i, obj_opt) in self.objs.iter_mut().enumerate() {
             if let Some(objhandle) = obj_opt {
                 if objhandle.alive {
                     objhandle.alive = false;
                 } else {
+                    /*
+                    if i == 0 {
+                        println!("i=0 collected");
+                        std::process::exit(1);
+                    }
+                     */
+                    // object is dead, deallocate
                     unsafe {
                         dealloc(objhandle.ptr as *mut u8, Layout::new::<ObjectInner>());
                     }
                     *obj_opt = None;
+                    self.free.insert(i);
                 }
             }
         }
+
+        self.sanity_check();
     }
 }
 
@@ -147,7 +163,7 @@ impl Object {
             objhandle.alive = true;
             &*objhandle.ptr
         };
-        dbg!(&objref);
+        // dbg!(&objref);
         if let ObjectInner::Model {
             model_name: _,
             fields,

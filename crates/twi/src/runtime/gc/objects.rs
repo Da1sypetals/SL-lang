@@ -2,10 +2,17 @@ use lex::token::teer;
 use parse::ast::stmt::StmtNode;
 use std::collections::BTreeMap;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
 pub struct Object {
     /// heap index
     pub(crate) hid: usize,
+}
+
+impl Eq for Object {}
+impl Ord for Object {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.hid.cmp(&other.hid)
+    }
 }
 
 #[derive(Debug)]

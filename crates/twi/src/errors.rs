@@ -48,8 +48,20 @@ pub enum TwiError {
     #[error("Unexpected statement: {}", .0)]
     UnexpectedStatement(String),
 
-    #[error("Number of args mismatch: expected {}, got {}", expected, got)]
-    ArgNumMismatch { expected: usize, got: usize },
+    #[error(
+        "In function {}: number of args mismatch: expected {}, got {}",
+        funcname,
+        expected,
+        got
+    )]
+    ArgNumMismatch {
+        funcname: String,
+        expected: usize,
+        got: usize,
+    },
+
+    #[error("Division by zero")]
+    DivisionByZero,
 
     #[error("Return value")]
     Return(Object),

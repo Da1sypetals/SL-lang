@@ -41,8 +41,7 @@ impl Runtime {
         if self.cur_scope_mut().vars.contains_key(&name) {
             return Err(TwiError::DuplicateLocalBind(name));
         }
-        let val = self.heap.alloc(ObjectInner::Func { params, body });
-        self.cur_scope_mut().add(name, val);
+        self.bind(name, ObjectInner::Func { params, body });
 
         Ok(())
     }
@@ -73,6 +72,7 @@ impl Runtime {
                     self.exec_stmt(stmt.clone())?;
                 }
             }
+            dbg!(&self.global_scope.vars);
             Ok(())
         } else {
             Err(TwiError::UnexpectedType {

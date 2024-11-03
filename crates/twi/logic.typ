@@ -4,4 +4,4 @@ Let:
 - if further not, runtime error.
 
 = Note
-Printing `model` with recursive reference causes stack overflow.
+- Intermediate result is allocated on heap, but is not tracked on stack, thus 

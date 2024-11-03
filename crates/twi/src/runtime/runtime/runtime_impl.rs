@@ -1,11 +1,12 @@
 use std::collections::BTreeMap;
 
+use log::info;
 use parse::ast::stmt::StmtNode;
 
 use crate::{
     errors::{TwiError, TwiResult},
-    runtime::gc::{gc::Heap, objects::ObjectInner},
-    scope::scope::ScopeType,
+    runtime::gc::{gc::Heap, objects::ObjectInner, timer::Timer},
+    scope::scope::{Scope, ScopeType},
 };
 
 use super::runtime::{GlobalVar, Model, Runtime};
@@ -16,10 +17,16 @@ impl Runtime {
     pub fn structure(statements: Vec<StmtNode>) -> TwiResult<Self> {
         let mut rt = Self {
             models: BTreeMap::new(),
-            global_vars: BTreeMap::new(),
             program: Vec::new(),
             heap: Heap::new(),
-            scopes: Vec::new(),
+            scopes: vec![],
+            gc_interval: 0.8,
+            gc_timer: Timer::new(),
+            global_scope: Scope {
+                scope_type: ScopeType::Global,
+                vars: BTreeMap::new(),
+                unnamed: Vec::new(),
+            },
         };
 
         for stmt in statements {
@@ -30,16 +37,18 @@ impl Runtime {
                         rt.program = body;
                         return Ok(rt);
                     } else {
-                        let func = rt.heap.alloc(ObjectInner::Func { params, body });
-                        rt.global_vars.insert(name, GlobalVar { obj: func });
+                        // bind in global scope
+                        let func = rt.alloc(ObjectInner::Func { params, body });
+                        rt.global_scope.add(name, func);
                     }
                 }
                 StmtNode::Model { name, fields } => {
                     rt.models.insert(name.clone(), Model { name, fields });
                 }
                 StmtNode::Let { ident, expr } => {
+                    // bind in global scope
                     let obj = rt.eval(expr)?;
-                    rt.global_vars.insert(ident, GlobalVar { obj });
+                    rt.global_scope.add(ident, obj);
                 }
                 s => return Err(TwiError::InvalidGlobalDefinition(format!("{:?}", s))),
             }
@@ -59,6 +68,15 @@ impl Runtime {
 
     /// todo: return
     pub fn exec_stmt(&mut self, stmt: StmtNode) -> TwiResult<()> {
+        // try gc
+        if self.gc_timer.elapsed() >= self.gc_interval {
+            self.gc();
+            self.gc_timer.reset();
+        }
+
+        // info!("scope.len={}", self.scopes.len());
+
+        // exec
         match stmt {
             StmtNode::Let { ident, expr } => {
                 self.exec_let(ident, expr)?;
@@ -92,6 +110,7 @@ impl Runtime {
                 self.exec_if_else(cond, if_body, else_body)?;
             }
             StmtNode::Scope { body } => {
+                info!("scope.len={}", self.scopes.len());
                 let sg = self.enter_scope(ScopeType::Block);
                 for stmt in body {
                     self.exec_stmt(stmt.clone())?;

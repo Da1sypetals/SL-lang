@@ -1,13 +1,8 @@
-use std::{fs, io::Write};
-
 use colored::Colorize;
 use lex::pest_parse::sl_parse_file;
-use parse::{display::print_stmt, parser::parser::Parser};
+use parse::parser::parser::Parser;
 
-use crate::{
-    errors::TwiError,
-    runtime::{gc::objects::ObjectInner, runtime::runtime::Runtime},
-};
+use crate::{errors::TwiError, runtime::runtime::runtime::Runtime};
 
 #[test]
 fn test_try() {
@@ -35,7 +30,7 @@ fn test_rt_base() {
         }
     };
 
-    let rt = Runtime::try_new(root);
+    let rt = Runtime::try_new(root, 0.8);
     let mut rt = match rt {
         Ok(rt) => rt,
         Err(e) => {
@@ -55,12 +50,11 @@ fn test_rt_base() {
     // dbg!(rt.heap);
 }
 
-#[test]
-fn test_rt_1() {
+fn run_program(path: &str) {
     std::env::set_var("RUST_LOG", "trace");
     pretty_env_logger::init();
 
-    let tokens = sl_parse_file("../../test_sources/exec_1.sl");
+    let tokens = sl_parse_file(path);
     let root = Parser::new_from_iter(tokens).parse_stmt();
     let root = match root {
         Ok(r) => r,
@@ -70,7 +64,7 @@ fn test_rt_1() {
         }
     };
 
-    let rt = Runtime::try_new(root);
+    let rt = Runtime::try_new(root, 0.8);
     let mut rt = match rt {
         Ok(rt) => rt,
         Err(e) => {
@@ -103,4 +97,14 @@ fn test_rt_1() {
     }
     // dbg!(rt.scopes);
     // dbg!(rt.heap);
+}
+
+#[test]
+fn test_exec_1() {
+    run_program("../../test_sources/exec_1.sl");
+}
+
+#[test]
+fn test_fib() {
+    run_program("../../test_sources/fib.sl");
 }

@@ -6,12 +6,14 @@ use crate::runtime::gc::objects::Object;
 pub enum ScopeType {
     Call,
     Block,
+    Global,
 }
 
 #[derive(Debug)]
 pub struct Scope {
     pub(crate) scope_type: ScopeType,
     pub(crate) vars: BTreeMap<String, Object>,
+    pub(crate) unnamed: Vec<Object>,
 }
 
 impl Scope {
@@ -20,6 +22,7 @@ impl Scope {
         Self {
             scope_type: ScopeType::Block,
             vars: BTreeMap::new(),
+            unnamed: Vec::new(),
         }
     }
 
@@ -27,6 +30,7 @@ impl Scope {
         Self {
             scope_type: ScopeType::Call,
             vars: BTreeMap::new(),
+            unnamed: Vec::new(),
         }
     }
 }
@@ -36,7 +40,7 @@ impl Scope {
         self.vars.insert(ident, obj);
     }
 
-    pub fn get(&mut self, ident: &str) -> Option<Object> {
+    pub fn get(&self, ident: &str) -> Option<Object> {
         self.vars.get(ident).map(|x| *x)
     }
 }
@@ -46,15 +50,15 @@ impl Scope {
     pub fn is_call(&self) -> bool {
         match self.scope_type {
             ScopeType::Call => true,
-            ScopeType::Block => false,
+            _ => false,
         }
     }
 
     #[inline(always)]
     pub fn is_block(&self) -> bool {
         match self.scope_type {
-            ScopeType::Call => false,
             ScopeType::Block => true,
+            _ => false,
         }
     }
 }
