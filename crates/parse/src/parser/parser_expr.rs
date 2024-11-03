@@ -172,6 +172,14 @@ impl ExprTokens {
                 left = ExprNode::div(left, right);
                 continue;
             }
+
+            if let Token::Percent = self.current() {
+                mul_continue = true;
+                self.cur += 1;
+                let right = self.parse_add()?;
+                left = ExprNode::modulus(left, right);
+                continue;
+            }
         }
         Ok(left)
     }

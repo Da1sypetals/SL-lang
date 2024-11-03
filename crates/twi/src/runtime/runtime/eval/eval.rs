@@ -39,6 +39,7 @@ impl Runtime {
             ExprNode::Minus { left, right } => self.eval_minus(*left, *right),
             ExprNode::Mul { left, right } => self.eval_mul(*left, *right),
             ExprNode::Div { left, right } => self.eval_div(*left, *right),
+            ExprNode::Mod { left, right } => self.eval_mod(*left, *right),
 
             ExprNode::Packed(expr) => self.eval(*expr),
 

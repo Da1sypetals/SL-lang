@@ -241,4 +241,25 @@ impl Runtime {
             }),
         }
     }
+
+    pub(crate) fn eval_mod(&mut self, left: ExprNode, right: ExprNode) -> TwiResult<Object> {
+        let lobj = self.eval(left)?;
+        let robj = self.eval(right)?;
+
+        let lval = self.heap.get_value(lobj);
+        let rval = self.heap.get_value(robj);
+
+        match (lval, rval) {
+            (Value::Int(i1), Value::Int(i2)) => {
+                if i2 == 0 {
+                    return Err(TwiError::DivisionByZero);
+                }
+                Ok(self.alloc(ObjectInner::Int(i1 % i2)))
+            }
+            (l, r) => Err(TwiError::IncompatibleBinopType {
+                left: l.to_string(),
+                right: r.to_string(),
+            }),
+        }
+    }
 }

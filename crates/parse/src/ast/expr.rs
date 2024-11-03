@@ -55,6 +55,10 @@ pub enum ExprNode {
         left: Box<ExprNode>,
         right: Box<ExprNode>,
     },
+    Mod {
+        left: Box<ExprNode>,
+        right: Box<ExprNode>,
+    },
     Mul {
         left: Box<ExprNode>,
         right: Box<ExprNode>,
@@ -165,6 +169,13 @@ impl ExprNode {
 
     pub fn div(left: ExprNode, right: ExprNode) -> Self {
         ExprNode::Div {
+            left: Box::new(left),
+            right: Box::new(right),
+        }
+    }
+
+    pub fn modulus(left: ExprNode, right: ExprNode) -> Self {
+        ExprNode::Mod {
             left: Box::new(left),
             right: Box::new(right),
         }

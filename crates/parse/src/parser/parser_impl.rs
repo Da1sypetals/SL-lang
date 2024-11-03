@@ -20,7 +20,7 @@ pub struct ParserStep {
 
 impl Parser {
     pub fn parse_stmt(&mut self) -> ParserResult<Root> {
-        let mut statements = Vec::new();
+        let mut statements: Vec<StmtNode> = Vec::new();
 
         while self.cur < self.tokens.len() {
             //

@@ -47,7 +47,7 @@ if __name__ == "__main__":
     res += add_gen(binops)
     print(res)
 
-    binops = [("Star", "mul"), ("Slash", "div")]
+    binops = [("Star", "mul"), ("Slash", "div"), ("Percent", "modulus")]
     res += mul_gen(binops)
     print(res)
 
