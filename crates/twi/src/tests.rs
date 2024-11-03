@@ -2,7 +2,7 @@ use colored::Colorize;
 use lex::pest_parse::sl_parse_file;
 use parse::parser::parser::Parser;
 
-use crate::{errors::TwiError, run_program, runtime::runtime::runtime::Runtime};
+use crate::{run_program, runtime::runtime::runtime::Runtime, InterpreterConfig};
 
 #[test]
 fn test_try() {
@@ -52,10 +52,10 @@ fn test_rt_base() {
 
 #[test]
 fn test_exec_1() {
-    run_program("../../test_sources/exec_1.sl");
+    run_program(InterpreterConfig::default("../../test_sources/exec_1.sl"));
 }
 
 #[test]
 fn test_fib() {
-    run_program("../../test_sources/fib.sl");
+    run_program(InterpreterConfig::default("../../test_sources/fib.sl"));
 }

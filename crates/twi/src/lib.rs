@@ -12,11 +12,33 @@ mod scope;
 #[cfg(test)]
 mod tests;
 
-pub fn run_program(path: &str) {
+use clap::Parser as ArgParser;
+
+/// Simple program to greet a person
+#[derive(ArgParser, Debug)]
+#[command(version, about, long_about = None)]
+pub struct InterpreterConfig {
+    #[arg(short, long)]
+    path: String,
+
+    #[arg(short('i'), long, default_value_t = 0.8)]
+    gc_interval: f64,
+}
+
+impl InterpreterConfig {
+    pub fn default(path: &str) -> Self {
+        Self {
+            path: path.to_string(),
+            gc_interval: 0.8,
+        }
+    }
+}
+
+pub fn run_program(cfg: InterpreterConfig) {
     std::env::set_var("RUST_LOG", "trace");
     pretty_env_logger::init();
 
-    let tokens = sl_parse_file(path);
+    let tokens = sl_parse_file(&cfg.path);
     let root = Parser::new_from_iter(tokens).parse_stmt();
     let root = match root {
         Ok(r) => r,
@@ -26,7 +48,7 @@ pub fn run_program(path: &str) {
         }
     };
 
-    let rt = Runtime::try_new(root, 0.8);
+    let rt = Runtime::try_new(root, cfg.gc_interval);
     let mut rt = match rt {
         Ok(rt) => rt,
         Err(e) => {

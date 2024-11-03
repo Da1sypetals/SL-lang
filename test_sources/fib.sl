@@ -12,7 +12,7 @@ func main() {
         return fib(n - 1) + fib(n - 2);
     }
 
-    let x = fib(26);
+    let x = fib(30);
     print x;
 
     <//
