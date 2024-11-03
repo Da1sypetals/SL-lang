@@ -9,13 +9,13 @@ func main() {
         if n == 1 {
             return 1;
         }
-        if n == 3 {
+        if n == 2 {
             return 1;
         }
-        return fib(n - 1) + fib(n - 2);
+        return fib(n - 1) + fib(n - 2) + fib(n - 3);
     }
 
-    let x = fib(30);
+    let x = fib(24);
     print x;
 
     <//
