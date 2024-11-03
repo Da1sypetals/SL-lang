@@ -13,7 +13,6 @@ use super::runtime::{GlobalVar, Model, Runtime};
 
 impl Runtime {
     //
-
     pub fn structure(statements: Vec<StmtNode>) -> TwiResult<Self> {
         let mut rt = Self {
             models: BTreeMap::new(),
@@ -58,23 +57,21 @@ impl Runtime {
     }
 
     pub fn run(&mut self) -> TwiResult<()> {
-        //
         for stmt in self.program.clone() {
             let stmt = stmt.clone();
             self.exec_stmt(stmt)?;
         }
         Ok(())
     }
+}
 
-    /// todo: return
+impl Runtime {
     pub fn exec_stmt(&mut self, stmt: StmtNode) -> TwiResult<()> {
-        // try gc
+        // try trigger GC
         if self.gc_timer.elapsed() >= self.gc_interval {
             self.gc();
             self.gc_timer.reset();
         }
-
-        // info!("scope.len={}", self.scopes.len());
 
         // exec
         match stmt {
@@ -117,7 +114,7 @@ impl Runtime {
                 }
             }
             StmtNode::FuncDef { name, params, body } => self.exec_funcdef(name, params, body)?,
-            StmtNode::Model { name, fields } => {
+            StmtNode::Model { name: _, fields: _ } => {
                 return Err(TwiError::UnexpectedStatement("Model".into()))
             }
             StmtNode::Assign { target, expr } => self.exec_assign(target, expr)?,

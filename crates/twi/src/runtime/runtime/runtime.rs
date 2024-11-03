@@ -63,8 +63,53 @@ impl Runtime {
         rt.scopes.push(Scope::call());
         Ok(rt)
     }
+}
 
-    pub fn cur_scope(&self) -> &Scope {
+// memory methods
+impl Runtime {
+    pub(crate) fn alloc(&mut self, obj_inner: ObjectInner) -> Object {
+        let obj = self.heap.alloc(obj_inner);
+        self.cur_scope_mut().unnamed.push(obj);
+        obj
+    }
+
+    // reference temporarily and annonymously
+    pub(crate) fn temp_ref(&mut self, obj: Object) {
+        self.cur_scope_mut().unnamed.push(obj);
+    }
+
+    pub(crate) fn bind(&mut self, name: String, obj_inner: ObjectInner) -> Object {
+        let obj = self.heap.alloc(obj_inner);
+        self.cur_scope_mut().vars.insert(name, obj);
+        obj
+    }
+
+    pub(crate) fn gc(&mut self) {
+        let mut roots = BTreeSet::new();
+        for scope in self.scopes.iter().chain(iter::once(&self.global_scope)) {
+            // for scope in self.scopes.iter() {
+            for (_, &obj) in &scope.vars {
+                roots.insert(obj);
+            }
+            for &obj in &scope.unnamed {
+                roots.insert(obj);
+            }
+        }
+        println!(
+            "{}",
+            format!(
+                "[SL GC] Collecting unused objects, roots.len={}",
+                roots.len()
+            )
+            .color("#888888")
+        );
+        self.heap.gc(roots.into_iter().collect());
+    }
+}
+
+// scope methods
+impl Runtime {
+    pub(crate) fn cur_scope(&self) -> &Scope {
         if let Some(scope) = self.scopes.last() {
             scope
         } else {
@@ -72,7 +117,7 @@ impl Runtime {
         }
     }
 
-    pub fn cur_scope_mut(&mut self) -> &mut Scope {
+    pub(crate) fn cur_scope_mut(&mut self) -> &mut Scope {
         if let Some(scope) = self.scopes.last_mut() {
             scope
         } else {
@@ -94,54 +139,15 @@ impl Runtime {
         }
     }
 
-    pub(crate) fn alloc(&mut self, obj_inner: ObjectInner) -> Object {
-        let obj = self.heap.alloc(obj_inner);
-        self.cur_scope_mut().unnamed.push(obj);
-        obj
-    }
-
-    // reference temporarily and annonymously
-    pub(crate) fn temp_ref(&mut self, obj: Object) {
-        self.cur_scope_mut().unnamed.push(obj);
-    }
-
-    pub(crate) fn bind(&mut self, name: String, obj_inner: ObjectInner) -> Object {
-        let obj = self.heap.alloc(obj_inner);
-        self.cur_scope_mut().vars.insert(name, obj);
-        obj
-    }
-
-    pub fn gc(&mut self) {
-        let mut roots = BTreeSet::new();
-        for scope in self.scopes.iter().chain(iter::once(&self.global_scope)) {
-            // for scope in self.scopes.iter() {
-            for (_, &obj) in &scope.vars {
-                roots.insert(obj);
-            }
-            for &obj in &scope.unnamed {
-                roots.insert(obj);
-            }
-        }
-        println!(
-            "{}",
-            format!(
-                "[SL GC] Collecting unused objects, roots.len={}",
-                roots.len()
-            )
-            .color("#888888")
-        );
-        self.heap.gc(roots.into_iter().collect());
-    }
-
-    pub fn global(&self) -> &Scope {
+    pub(crate) fn global(&self) -> &Scope {
         &self.global_scope
     }
 
-    pub fn global_mut(&mut self) -> &mut Scope {
+    pub(crate) fn global_mut(&mut self) -> &mut Scope {
         &mut self.global_scope
     }
 
-    pub fn scopes_mut(&mut self) -> (&mut Vec<Scope>, &mut Scope) {
+    pub(crate) fn scopes_mut(&mut self) -> (&mut Vec<Scope>, &mut Scope) {
         (&mut self.scopes, &mut self.global_scope)
     }
 }

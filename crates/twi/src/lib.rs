@@ -1,20 +1,22 @@
 // Rustc please remind me of unused scopeguard
 #![forbid(unused_must_use)]
-
-use colored::Colorize;
-use errors::TwiError;
-use lex::pest_parse::sl_parse_file;
-use parse::parser::parser::Parser;
-use runtime::runtime::runtime::Runtime;
 mod errors;
 mod runtime;
 mod scope;
 #[cfg(test)]
 mod tests;
 
-use clap::Parser as ArgParser;
+// ###################################################
+// ################ Interface Wrapper ################
+// ###################################################
 
-/// Simple program to greet a person
+use clap::Parser as ArgParser;
+use colored::Colorize;
+use errors::TwiError;
+use lex::pest_parse::sl_parse_file;
+use parse::parser::parser::Parser;
+use runtime::runtime::runtime::Runtime;
+
 #[derive(ArgParser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct InterpreterConfig {

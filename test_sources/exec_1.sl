@@ -19,6 +19,10 @@ func main() {
         print p.name.name;
     }
 
+    print p.name.name;
+    print p.age;
+    print p.name._n_page;
+
     let a = 2;
 
     for i: 600000 {
