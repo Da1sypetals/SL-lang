@@ -72,7 +72,7 @@ impl Runtime {
                     self.exec_stmt(stmt.clone())?;
                 }
             }
-            dbg!(&self.global_scope.vars);
+            // dbg!(&self.global_scope.vars);
             Ok(())
         } else {
             Err(TwiError::UnexpectedType {

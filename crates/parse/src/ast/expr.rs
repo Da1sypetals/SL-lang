@@ -80,7 +80,14 @@ impl TryFrom<Vec<Token>> for ExprNode {
             cur: 0,
         };
 
-        expr_tks.parse_expr()
+        let expr = expr_tks.parse_expr()?;
+        if expr_tks.cur < expr_tks.tokens.len() {
+            return Err(ParserError::UncompletedExpr {
+                index: expr_tks.cur,
+                tokens: expr_tks.tokens,
+            });
+        }
+        Ok(expr)
 
         // // only 1 token
         // if value.len() == 1 {

@@ -6,6 +6,13 @@ pub enum ParserError {
     #[error("Expected literal, found {:?}", .0)]
     NotLiteral(Token),
 
+    #[error(
+        "Uncompleted expression: parsed to\n >> index = {} \non token sequence\n >> {:?}",
+        index,
+        tokens
+    )]
+    UncompletedExpr { index: usize, tokens: Vec<Token> },
+
     #[error("Invalid sytnax: {}", .0)]
     InvalidSyntax(String), // message
 
